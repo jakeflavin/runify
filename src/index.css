@@ -1,0 +1,894 @@
+/*
+ * Runify — a Strava skin.
+ *
+ * Strava's interface is built from four moves, and everything here is in service of them:
+ *
+ *   1. One accent, used sparingly. Strava orange marks the route, the primary action and
+ *      the selected tab. Nothing else is orange — not headings, not borders, not links in
+ *      running text. The restraint is what makes the orange read as "this is your effort".
+ *   2. Numbers are the interface. Stats are set large, tight and tabular, under a tiny
+ *      letterspaced caps label. The label explains; the number is the thing you came for.
+ *   3. Structure from hairlines, not cards-on-cards. Panels sit on a hairline border with
+ *      almost no shadow; stat groups are divided by 1px rules rather than gaps.
+ *   4. Pills. Buttons, tabs, chips and badges are fully rounded.
+ *
+ * Type is Inter, which is the closest widely-available face to Strava's UI sans, set with
+ * tabular figures everywhere a number can change.
+ *
+ * The data palette at the bottom is content, not chrome: one hue per measured quantity,
+ * held constant wherever that quantity appears, and never used on a control.
+ */
+
+:root,
+:root[data-theme='light'] {
+  --font-sans:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+
+  --bg: #f2f2f5;
+  --surface: #ffffff;
+  --surface-hi: #f7f7fa;
+  --surface-sunken: #ebebf0;
+  --line: #dfdfe6;
+  --line-strong: #c2c2cc;
+  --text: #1c1c1e;
+  --text-mid: #4a4a55;
+  --dim: #767680;
+
+  --brand: #fc5200;
+  --brand-hover: #e34800;
+  --brand-ink: #ffffff;
+  --brand-wash: #fff0e9;
+
+  --success: #1a7f4b;
+  --danger: #c0362c;
+  --warn: #b06f00;
+
+  --shadow-card: 0 1px 2px rgba(20, 20, 30, 0.05);
+  --shadow-float: 0 4px 16px rgba(20, 20, 30, 0.14), 0 0 0 1px rgba(20, 20, 30, 0.06);
+
+  --map-filter: none;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f0f11;
+  --surface: #1a1a1d;
+  --surface-hi: #232327;
+  --surface-sunken: #131316;
+  --line: #2e2e34;
+  --line-strong: #45454e;
+  --text: #f2f2f5;
+  --text-mid: #c2c2cc;
+  --dim: #8a8a94;
+
+  --brand: #fc5200;
+  --brand-hover: #ff6a24;
+  --brand-ink: #ffffff;
+  --brand-wash: #33180c;
+
+  --success: #4ec27f;
+  --danger: #f2776b;
+  --warn: #e0a028;
+
+  --shadow-card: none;
+  --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  color-scheme: dark;
+}
+
+/* Series colours — one per measured quantity. Never used on a control. */
+:root {
+  --s-pace: #fc5200;
+  --s-elevation: #7a8a99;
+  --s-hr: #e0245e;
+  --s-cadence: #6c5ce7;
+  --s-grade: #b06f00;
+
+  --z1: #9aa4ad;
+  --z2: #4a90d9;
+  --z3: #3fae6a;
+  --z4: #e8912a;
+  --z5: #d9453a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Opt every control out of native theming.
+ *
+ * A control left at `appearance: auto` is still a platform widget as far as the browser is
+ * concerned, and Chrome's automatic dark mode will re-colour it — overriding an author
+ * background, including an explicit hex. Everything here is drawn from the token set, so the
+ * native appearance has nothing to contribute and only takes things away.
+ */
+button,
+input[type='checkbox'],
+input[type='number'],
+input[type='text'],
+select {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.wordmark svg {
+  color: var(--brand);
+}
+
+.masthead-spacer {
+  flex: 1;
+}
+
+/*
+ * On a phone the masthead has to hold the mode switch, the units and the theme, and there is
+ * not room for the name as well. The mark stays — it is the thing people recognise — and the
+ * wordmark returns as soon as there is room for it.
+ */
+@media (max-width: 560px) {
+  .masthead {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .wordmark span {
+    display: none;
+  }
+
+  .segmented button {
+    padding: 0 10px;
+  }
+}
+
+.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  min-height: 0;
+}
+
+/*
+ * The map inside the stage is absolutely positioned, so the stage has no content height of
+ * its own. On the two-column layout the grid row stretches it to match the rail and that is
+ * invisible; on the single-column layout below there is no rail beside it to borrow height
+ * from, and without a floor the map would collapse to nothing.
+ */
+.workspace > .stage {
+  min-width: 0;
+  min-height: 320px;
+  position: relative;
+}
+
+.rail {
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  overflow-y: auto;
+  max-height: calc(100dvh - 56px);
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  /* Enough map to draw on, with the numbers starting just below the fold. */
+  .workspace > .stage {
+    min-height: 60vh;
+  }
+
+  .rail {
+    border-left: none;
+    border-top: 1px solid var(--line);
+    max-height: none;
+  }
+}
+
+/* ── Panels & sections ──────────────────────────────────────────────────── */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.section {
+  border-bottom: 1px solid var(--line);
+  padding: 16px;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.section-head .spacer {
+  flex: 1;
+}
+
+/* ── Stats ──────────────────────────────────────────────────────────────── */
+
+.stat-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.stat-row > .stat + .stat {
+  border-left: 1px solid var(--line);
+}
+
+.stat {
+  padding: 0 12px;
+  min-width: 0;
+}
+
+.stat:first-child {
+  padding-left: 0;
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: 2px;
+  /* Stats sit in equal grid columns. A value wider than its share has to be clipped to its
+     own column rather than spilling across the hairline into the next one. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-value .unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dim);
+  margin-left: 2px;
+  letter-spacing: 0;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 1px;
+}
+
+.stat.lg .stat-value {
+  font-size: 34px;
+}
+
+.stat.sm .stat-value {
+  font-size: 18px;
+}
+
+/* ── Controls ───────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--surface-hi);
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+
+.btn.ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--surface-hi);
+}
+
+.btn.icon {
+  width: 34px;
+  padding: 0;
+}
+
+.btn.sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.btn.sm.icon {
+  width: 28px;
+  padding: 0;
+}
+
+.btn.danger:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: transparent;
+}
+
+/* Segmented control — the Strava tab pill. */
+.segmented {
+  display: inline-flex;
+  background: var(--surface-sunken);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.segmented button {
+  border: none;
+  background: transparent;
+  color: var(--dim);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 14px;
+  height: 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+
+.segmented button:hover:not([aria-pressed='true']) {
+  color: var(--text);
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-card);
+}
+
+.segmented.brand button[aria-pressed='true'] {
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field > label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.input {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+}
+
+.input:focus {
+  border-color: var(--brand);
+  outline: none;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.switch input {
+  appearance: none;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin: 0;
+  flex: none;
+}
+
+.switch input::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s;
+}
+
+.switch input:checked {
+  background: var(--brand);
+}
+
+.switch input:checked::after {
+  transform: translateX(14px);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--surface-hi);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+
+.chip.brand {
+  background: var(--brand-wash);
+  border-color: transparent;
+  color: var(--brand);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.muted {
+  color: var(--dim);
+}
+
+.empty {
+  color: var(--dim);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px 12px;
+  line-height: 1.5;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: right;
+  padding: 0 0 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
+}
+
+.table td {
+  padding: 7px 0;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table td.num {
+  font-weight: 600;
+}
+
+.table .bar-cell {
+  width: 40%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* The horizontal pace bar Strava draws beside each split. */
+.bar {
+  height: 9px;
+  border-radius: 999px;
+  background: var(--brand);
+  min-width: 3px;
+}
+
+.bar.dim {
+  background: var(--line-strong);
+}
+
+/* ── Map ────────────────────────────────────────────────────────────────── */
+
+.map {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-sunken);
+}
+
+.map:focus-visible {
+  outline-offset: -2px;
+}
+
+.leaflet-container {
+  background: var(--surface-sunken);
+  font: inherit;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.75) !important;
+  font-size: 10px !important;
+}
+
+:root[data-theme='dark'] .leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: var(--dim) !important;
+}
+
+:root[data-theme='dark'] .leaflet-control-attribution a {
+  color: var(--text-mid) !important;
+}
+
+.map-overlay {
+  position: absolute;
+  z-index: 450;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.map-overlay.top-left {
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  flex-wrap: wrap;
+}
+
+.map-overlay.bottom-left {
+  bottom: 24px;
+  left: 12px;
+}
+
+.floating {
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow-float);
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.hint {
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-float);
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-mid);
+  max-width: 260px;
+}
+
+/* Route waypoint markers, drawn as divIcons so they inherit the palette. */
+.wp {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--brand);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  cursor: grab;
+}
+
+.wp.start {
+  background: var(--brand);
+  border-color: var(--surface);
+  width: 16px;
+  height: 16px;
+}
+
+.wp.end {
+  background: var(--text);
+  border-color: var(--surface);
+  width: 16px;
+  height: 16px;
+}
+
+.wp:active {
+  cursor: grabbing;
+}
+
+/* ── Charts ─────────────────────────────────────────────────────────────── */
+
+.chart {
+  width: 100%;
+  user-select: none;
+}
+
+.recharts-cartesian-axis-tick text {
+  fill: var(--dim);
+  font-size: 10px;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+.tooltip {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow-float);
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.tooltip .k {
+  color: var(--dim);
+  margin-right: 8px;
+}
+
+.tooltip .v {
+  font-weight: 700;
+}
+
+/* ── Drop zone ──────────────────────────────────────────────────────────── */
+
+.dropzone {
+  border: 2px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--dim);
+  cursor: pointer;
+  background: var(--surface-hi);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.dropzone:hover,
+.dropzone.over {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+  color: var(--brand);
+}
+
+.dropzone strong {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.dropzone.over strong {
+  color: var(--brand);
+}
+
+/* ── Lists ──────────────────────────────────────────────────────────────── */
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item:hover {
+  background: var(--surface-hi);
+}
+
+.list-item .grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item .name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-item .meta {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* Zone meter — one stacked bar per heart-rate zone. */
+.zone-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 62px;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.zone-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.zone-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

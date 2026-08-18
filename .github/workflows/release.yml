@@ -1,0 +1,47 @@
+# Publishes this app's built `dist` as a release artifact.
+#
+# This is NOT a deploy. The portfolio pulls the latest artifact in when its own deploy
+# workflow is triggered, so merging here never pushes anything to production on its own.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
+      - run: npm test --if-present
+      - run: npm run build
+
+      # Extracted by the portfolio into dist/<slug>/, so index.html must sit at the root
+      # of the tarball.
+      - name: Package dist
+        run: tar -czf dist.tar.gz -C dist .
+
+      - name: Publish release
+        run: |
+          gh release create "build-${{ github.run_number }}" dist.tar.gz \
+            --title "build-${{ github.run_number }}" \
+            --notes "Automated build from ${{ github.sha }}."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
