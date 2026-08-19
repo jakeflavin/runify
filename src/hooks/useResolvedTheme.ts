@@ -12,10 +12,14 @@ export function useResolvedTheme(): 'light' | 'dark' {
   )
 
   useEffect(() => {
-    const read = () => setTheme((document.documentElement.dataset.theme as 'light' | 'dark') ?? 'light')
+    const read = () =>
+      setTheme((document.documentElement.dataset.theme as 'light' | 'dark') ?? 'light')
     read()
     const observer = new MutationObserver(read)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    })
     return () => observer.disconnect()
   }, [])
 

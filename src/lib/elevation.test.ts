@@ -50,6 +50,11 @@ describe('gradients', () => {
 
   it('is zero on the flat', () => {
     const distances = Array.from({ length: 20 }, (_, i) => i * 10)
-    expect(gradients(distances, distances.map(() => 42))[10]).toBe(0)
+    expect(
+      gradients(
+        distances,
+        distances.map(() => 42),
+      )[10],
+    ).toBe(0)
   })
 })

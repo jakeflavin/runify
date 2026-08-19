@@ -65,7 +65,7 @@ export function bearing(a: LatLng, b: LatLng): number {
   const x =
     Math.cos(rad(a.lat)) * Math.sin(rad(b.lat)) -
     Math.sin(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.cos(dLon)
-  return (((Math.atan2(y, x) * 180) / Math.PI) + 360) % 360
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360
 }
 
 /** Bounding box as Leaflet wants it: [[south, west], [north, east]]. */

@@ -67,7 +67,11 @@ export function parseActivityFile(xml: string, fallbackName: string): Activity {
 
   const root = doc.documentElement?.localName?.toLowerCase()
   const activity =
-    root === 'gpx' ? parseGpx(doc, fallbackName) : root === 'trainingcenterdatabase' ? parseTcx(doc, fallbackName) : null
+    root === 'gpx'
+      ? parseGpx(doc, fallbackName)
+      : root === 'trainingcenterdatabase'
+        ? parseTcx(doc, fallbackName)
+        : null
 
   if (!activity) throw new ParseError('Expected a GPX or TCX file.')
   if (activity.points.length < 2) throw new ParseError('That file has no track points in it.')
@@ -95,8 +99,12 @@ function parseGpx(doc: Document, fallbackName: string): Activity {
 
   // The track name, then the file's metadata name, then whatever the file was called.
   const name =
-    byName(doc, 'trk').map((trk) => text(trk, 'name')).find(Boolean) ??
-    byName(doc, 'metadata').map((meta) => text(meta, 'name')).find(Boolean) ??
+    byName(doc, 'trk')
+      .map((trk) => text(trk, 'name'))
+      .find(Boolean) ??
+    byName(doc, 'metadata')
+      .map((meta) => text(meta, 'name'))
+      .find(Boolean) ??
     fallbackName
 
   return { name, startTime: points.find((p) => p.time)?.time, points }
@@ -146,7 +154,10 @@ function doubleCadence(value: number | undefined): number | undefined {
 /** Serialise a planned route as a GPX track, so it can go onto a watch. */
 export function toGpx(name: string, points: { lat: number; lon: number; ele?: number }[]): string {
   const escape = (value: string) =>
-    value.replace(/[<>&'"]/g, (c) => `&${{ '<': 'lt', '>': 'gt', '&': 'amp', "'": 'apos', '"': 'quot' }[c]};`)
+    value.replace(
+      /[<>&'"]/g,
+      (c) => `&${{ '<': 'lt', '>': 'gt', '&': 'amp', "'": 'apos', '"': 'quot' }[c]};`,
+    )
 
   const body = points
     .map((p) => {

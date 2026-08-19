@@ -8,7 +8,13 @@
  */
 
 import type { Split } from '../lib/analysis'
-import { formatDuration, formatElevation, formatPace, unitLabels, type UnitSystem } from '../lib/units'
+import {
+  formatDuration,
+  formatElevation,
+  formatPace,
+  unitLabels,
+  type UnitSystem,
+} from '../lib/units'
 
 export function SplitsTable({
   splits,
@@ -50,7 +56,12 @@ export function SplitsTable({
             <tr key={split.index}>
               <td>
                 {split.index}
-                {partial && <span className="muted"> · {(split.meters / (splits[0]?.meters ?? 1)).toFixed(2)}</span>}
+                {partial && (
+                  <span className="muted">
+                    {' '}
+                    · {(split.meters / (splits[0]?.meters ?? 1)).toFixed(2)}
+                  </span>
+                )}
               </td>
               <td className="num">
                 {formatPace(split.pace)}
@@ -64,7 +75,9 @@ export function SplitsTable({
               </td>
               {showGap && (
                 <td className="muted">
-                  {Number.isFinite(split.gradeAdjustedPace) ? formatPace(split.gradeAdjustedPace) : '—'}
+                  {Number.isFinite(split.gradeAdjustedPace)
+                    ? formatPace(split.gradeAdjustedPace)
+                    : '—'}
                 </td>
               )}
               <td className="muted">

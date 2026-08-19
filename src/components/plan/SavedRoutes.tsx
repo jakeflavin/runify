@@ -28,7 +28,13 @@ export function SavedRoutes({
             <button
               type="button"
               className="grow"
-              style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', cursor: 'pointer' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
               onClick={() => onOpen(route)}
             >
               <span className="name">{route.name}</span>

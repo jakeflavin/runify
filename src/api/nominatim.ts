@@ -24,7 +24,12 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
   const trimmed = query.trim()
   if (trimmed.length < 3) return []
 
-  const params = new URLSearchParams({ q: trimmed, format: 'jsonv2', limit: '6', addressdetails: '0' })
+  const params = new URLSearchParams({
+    q: trimmed,
+    format: 'jsonv2',
+    limit: '6',
+    addressdetails: '0',
+  })
   const response = await fetch(`${HOST}/search?${params}`, { signal })
   if (!response.ok) throw new Error('Search is unavailable right now.')
 

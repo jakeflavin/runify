@@ -86,7 +86,13 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
       {open && results.length > 0 && (
         <div
           className="panel"
-          style={{ position: 'absolute', top: 44, left: 0, right: 0, boxShadow: 'var(--shadow-float)' }}
+          style={{
+            position: 'absolute',
+            top: 44,
+            left: 0,
+            right: 0,
+            boxShadow: 'var(--shadow-float)',
+          }}
         >
           <div className="list" style={{ padding: '4px 12px' }}>
             {results.map((place) => (

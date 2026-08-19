@@ -19,7 +19,13 @@ import {
   YAxis,
 } from 'recharts'
 import { pointAt, type LatLng } from '../../lib/geo'
-import { formatDistance, formatPace, toDistance, unitLabels, type UnitSystem } from '../../lib/units'
+import {
+  formatDistance,
+  formatPace,
+  toDistance,
+  unitLabels,
+  type UnitSystem,
+} from '../../lib/units'
 
 export function PaceChart({
   distances,
@@ -61,7 +67,8 @@ export function PaceChart({
   const data = distances.map((distance, i) => ({
     x: toDistance(distance, units),
     meters: distance,
-    pace: Number.isFinite(paces[i]) && (paces[i] ?? Infinity) <= ceiling ? (paces[i] ?? null) : null,
+    pace:
+      Number.isFinite(paces[i]) && (paces[i] ?? Infinity) <= ceiling ? (paces[i] ?? null) : null,
     hr: heartRates?.[i] ?? null,
   }))
 
@@ -75,7 +82,12 @@ export function PaceChart({
   const hasHr = data.some((row) => row.hr !== null)
 
   return (
-    <div className="chart" onMouseLeave={() => onHover?.(null)} style={{ height }} aria-label="Pace">
+    <div
+      className="chart"
+      onMouseLeave={() => onHover?.(null)}
+      style={{ height }}
+      aria-label="Pace"
+    >
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -123,7 +135,7 @@ export function PaceChart({
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null
               const point = payload[0]?.payload as (typeof data)[number] | undefined
-    if (!point) return null
+              if (!point) return null
               return (
                 <div className="tooltip">
                   <div>

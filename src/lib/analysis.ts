@@ -304,7 +304,8 @@ export function timeInZones(points: TrackPoint[], maxHr: number): number[] {
     if (hr === undefined || time === undefined || before.time === undefined) continue
     const dt = (time - before.time) / 1000
     const fraction = hr / maxHr
-    const zone = fraction < 0.6 ? 0 : fraction < 0.7 ? 1 : fraction < 0.8 ? 2 : fraction < 0.9 ? 3 : 4
+    const zone =
+      fraction < 0.6 ? 0 : fraction < 0.7 ? 1 : fraction < 0.8 ? 2 : fraction < 0.9 ? 3 : 4
     buckets[zone] = (buckets[zone] ?? 0) + dt
   }
   return buckets

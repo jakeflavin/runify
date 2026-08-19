@@ -3,7 +3,18 @@
  */
 
 import { Suspense, lazy, useState } from 'react'
-import { Bike, Download, Footprints, Loader2, Redo2, Repeat, RotateCcw, Save, Trash2, Undo2 } from 'lucide-react'
+import {
+  Bike,
+  Download,
+  Footprints,
+  Loader2,
+  Redo2,
+  Repeat,
+  RotateCcw,
+  Save,
+  Trash2,
+  Undo2,
+} from 'lucide-react'
 import { Section, Segmented, Stat, Switch } from '../ui'
 import { PacePlanner } from './PacePlanner'
 import { SavedRoutes } from './SavedRoutes'
@@ -80,7 +91,10 @@ export function PlanPanel({
             </span>
           )}
           {!route.routing && route.waypoints.length > 1 && snap && !route.fullySnapped && (
-            <span className="chip" title="The routing service could not snap every leg; those are straight lines.">
+            <span
+              className="chip"
+              title="The routing service could not snap every leg; those are straight lines."
+            >
               Partly straight
             </span>
           )}
@@ -204,7 +218,12 @@ export function PlanPanel({
         </Section>
       )}
 
-      <SavedRoutes routes={savedRoutes} units={units} onOpen={onOpenSaved} onRemove={onRemoveSaved} />
+      <SavedRoutes
+        routes={savedRoutes}
+        units={units}
+        onOpen={onOpenSaved}
+        onRemove={onRemoveSaved}
+      />
     </>
   )
 }

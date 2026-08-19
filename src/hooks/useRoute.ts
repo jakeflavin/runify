@@ -74,7 +74,10 @@ export function useRoute(snap: boolean, costing: Costing) {
     setRouting(true)
 
     Promise.all(
-      missing.map(async (leg) => [leg.id, await routeLeg(leg.from, leg.to, costing, controller.signal)] as const),
+      missing.map(
+        async (leg) =>
+          [leg.id, await routeLeg(leg.from, leg.to, costing, controller.signal)] as const,
+      ),
     ).then((results) => {
       if (controller.signal.aborted) return
       setCache((current) => {
@@ -132,7 +135,10 @@ export function useRoute(snap: boolean, costing: Costing) {
     /** True once every leg has come back snapped — the line follows real paths end to end. */
     fullySnapped: legs.length > 0 && legs.every((leg) => leg.snapped),
 
-    add: useCallback((point: LatLng) => commit((current) => [...current, makeWaypoint(point)]), [commit]),
+    add: useCallback(
+      (point: LatLng) => commit((current) => [...current, makeWaypoint(point)]),
+      [commit],
+    ),
 
     move: useCallback(
       (id: string, point: LatLng) =>
@@ -167,10 +173,7 @@ export function useRoute(snap: boolean, costing: Costing) {
 
     reverse: useCallback(() => commit((current) => [...current].reverse()), [commit]),
 
-    load: useCallback(
-      (points: LatLng[]) => commit(() => points.map(makeWaypoint)),
-      [commit],
-    ),
+    load: useCallback((points: LatLng[]) => commit(() => points.map(makeWaypoint)), [commit]),
 
     undo: useCallback(() => {
       setHistory((past) => {

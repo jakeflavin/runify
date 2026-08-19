@@ -10,7 +10,14 @@
 
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { pointAt, type LatLng } from '../../lib/geo'
-import { formatDistance, formatElevation, toDistance, toElevation, unitLabels, type UnitSystem } from '../../lib/units'
+import {
+  formatDistance,
+  formatElevation,
+  toDistance,
+  toElevation,
+  unitLabels,
+  type UnitSystem,
+} from '../../lib/units'
 
 export interface ElevationPoint {
   /** Metres from the start. */
@@ -93,7 +100,7 @@ export function ElevationChart({
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null
               const point = payload[0]?.payload as (typeof data)[number] | undefined
-    if (!point) return null
+              if (!point) return null
               return (
                 <div className="tooltip">
                   <div>

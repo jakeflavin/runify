@@ -369,7 +369,10 @@ select {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
 }
 
 .btn:hover:not(:disabled) {
@@ -446,7 +449,9 @@ select {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .segmented button:hover:not([aria-pressed='true']) {
@@ -786,7 +791,10 @@ select {
   color: var(--dim);
   cursor: pointer;
   background: var(--surface-hi);
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
 }
 
 .dropzone:hover,

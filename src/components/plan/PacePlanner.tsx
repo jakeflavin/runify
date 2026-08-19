@@ -12,7 +12,17 @@ import { Flag, Timer } from 'lucide-react'
 import { Section, Segmented, Stat } from '../ui'
 import { SplitsTable } from '../SplitsTable'
 import { effortLength, predictSplits } from '../../lib/plan'
-import { RACES, formatDistance, formatDuration, formatPace, parseDuration, toDistance, unitLabels, unitMeters, type UnitSystem } from '../../lib/units'
+import {
+  RACES,
+  formatDistance,
+  formatDuration,
+  formatPace,
+  parseDuration,
+  toDistance,
+  unitLabels,
+  unitMeters,
+  type UnitSystem,
+} from '../../lib/units'
 import { riegel } from '../../lib/pace'
 import type { RouteProfile } from '../../hooks/useElevationProfile'
 
@@ -91,7 +101,9 @@ export function PacePlanner({
               className="input"
               inputMode="numeric"
               placeholder="9:00"
-              value={mode === 'pace' ? paceText : Number.isFinite(flatPace) ? formatPace(flatPace) : ''}
+              value={
+                mode === 'pace' ? paceText : Number.isFinite(flatPace) ? formatPace(flatPace) : ''
+              }
               readOnly={mode === 'time'}
               onChange={(event) => setPaceText(event.target.value)}
             />
@@ -103,7 +115,9 @@ export function PacePlanner({
               className="input"
               inputMode="numeric"
               placeholder="45:00"
-              value={mode === 'time' ? timeText : Number.isFinite(finish) ? formatDuration(finish) : ''}
+              value={
+                mode === 'time' ? timeText : Number.isFinite(finish) ? formatDuration(finish) : ''
+              }
               readOnly={mode === 'pace'}
               onChange={(event) => setTimeText(event.target.value)}
             />
@@ -131,8 +145,8 @@ export function PacePlanner({
         <Section title={`Predicted splits · ${splits.length} ${labels.distance}`}>
           <SplitsTable splits={splits} units={units} showGap />
           <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-            Each split is the pace the terrain will produce while you hold the same effort.
-            GAP stays fixed — that is the effort you asked for.
+            Each split is the pace the terrain will produce while you hold the same effort. GAP
+            stays fixed — that is the effort you asked for.
           </p>
         </Section>
       )}
@@ -178,7 +192,11 @@ function RaceEquivalents({
   units: UnitSystem
 }) {
   if (!Number.isFinite(seconds) || seconds <= 0 || meters < 1000) {
-    return <p className="empty" style={{ padding: '8px 0' }}>Draw a longer route to see race equivalents.</p>
+    return (
+      <p className="empty" style={{ padding: '8px 0' }}>
+        Draw a longer route to see race equivalents.
+      </p>
+    )
   }
 
   const labels = unitLabels(units)
@@ -199,7 +217,10 @@ function RaceEquivalents({
             <tr key={race.name}>
               <td>
                 {race.name}
-                <span className="muted"> · {formatDistance(race.meters, units, 1)} {labels.distance}</span>
+                <span className="muted">
+                  {' '}
+                  · {formatDistance(race.meters, units, 1)} {labels.distance}
+                </span>
               </td>
               <td className="num">{formatDuration(predicted)}</td>
               <td className="muted">

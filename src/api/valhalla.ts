@@ -118,9 +118,12 @@ export async function heightProfile(
   const body = { shape: shape.map((p) => ({ lat: p.lat, lon: p.lon })) }
 
   try {
-    const response = await fetch(`${HOST}/height?json=${encodeURIComponent(JSON.stringify(body))}`, {
-      signal,
-    })
+    const response = await fetch(
+      `${HOST}/height?json=${encodeURIComponent(JSON.stringify(body))}`,
+      {
+        signal,
+      },
+    )
     if (!response.ok) return null
 
     const data = (await response.json()) as { height?: number[] }

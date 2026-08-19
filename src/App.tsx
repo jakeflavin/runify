@@ -35,10 +35,7 @@ export default function App() {
 
   const [activity, setActivity] = useState<Activity | null>(null)
   const [parseFailure, setParseFailure] = useState<string | null>(null)
-  const analysis = useMemo(
-    () => (activity ? analyse(activity, units) : null),
-    [activity, units],
-  )
+  const analysis = useMemo(() => (activity ? analyse(activity, units) : null), [activity, units])
 
   // The map shows whichever side is in front.
   const planning = mode === 'plan'
@@ -52,9 +49,7 @@ export default function App() {
       setActivity(parsed)
       setFocus({ bounds: boundsOf(parsed.points), nonce: Date.now() })
     } catch (error) {
-      setParseFailure(
-        error instanceof ParseError ? error.message : 'That file could not be read.',
-      )
+      setParseFailure(error instanceof ParseError ? error.message : 'That file could not be read.')
       setActivity(null)
     }
   }, [])
@@ -245,7 +240,8 @@ function paceColors(analysis: ReturnType<typeof analyse> | null): string[] | und
   return paces.map((pace): string => {
     if (!Number.isFinite(pace)) return '#9aa4ad' // stopped
     // Lower pace is faster, so the first band is the brightest.
-    for (let i = 0; i < cuts.length; i++) if (pace <= (cuts[i] ?? Infinity)) return ramp[i] ?? '#8a2c00'
+    for (let i = 0; i < cuts.length; i++)
+      if (pace <= (cuts[i] ?? Infinity)) return ramp[i] ?? '#8a2c00'
     return ramp[4] ?? '#8a2c00'
   })
 }
@@ -262,7 +258,13 @@ function Mark() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M9.5 15.5L14 17l1.5 4" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M9.5 15.5L14 17l1.5 4"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }

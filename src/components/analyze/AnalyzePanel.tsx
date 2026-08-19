@@ -59,13 +59,17 @@ export function AnalyzePanel({
   return (
     <>
       <Section
-        title={activity.startTime ? new Date(activity.startTime).toLocaleString(undefined, {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-        }) : 'Activity'}
+        title={
+          activity.startTime
+            ? new Date(activity.startTime).toLocaleString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+              })
+            : 'Activity'
+        }
         action={
           <button type="button" className="btn ghost sm" onClick={onReplace}>
             <Repeat2 size={14} /> New file
@@ -130,12 +134,7 @@ export function AnalyzePanel({
               <Stat label="Cadence" value={analysis.avgCadence ?? '—'} unit="spm" size="sm" />
             )}
             {Number.isFinite(fitness) && (
-              <Stat
-                label="VDOT"
-                value={fitness.toFixed(1)}
-                size="sm"
-                sub="Daniels & Gilbert"
-              />
+              <Stat label="VDOT" value={fitness.toFixed(1)} size="sm" sub="Daniels & Gilbert" />
             )}
           </div>
         )}
@@ -182,8 +181,8 @@ export function AnalyzePanel({
           title="Elevation"
           action={
             <span className="chip">
-              <TrendingUp size={11} aria-hidden="true" />
-              +{formatElevation(analysis.elevation.gain, units)} / −
+              <TrendingUp size={11} aria-hidden="true" />+
+              {formatElevation(analysis.elevation.gain, units)} / −
               {formatElevation(analysis.elevation.loss, units)} {labels.elevation}
             </span>
           }

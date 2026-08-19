@@ -49,7 +49,8 @@ export function vdot(meters: number, seconds: number): number {
   const minutes = seconds / 60
   const velocity = meters / minutes // metres per minute
   const cost = -4.6 + 0.182258 * velocity + 0.000104 * velocity ** 2
-  const fraction = 0.8 + 0.1894393 * Math.exp(-0.012778 * minutes) + 0.2989558 * Math.exp(-0.1932605 * minutes)
+  const fraction =
+    0.8 + 0.1894393 * Math.exp(-0.012778 * minutes) + 0.2989558 * Math.exp(-0.1932605 * minutes)
   return cost / fraction
 }
 
