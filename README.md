@@ -98,3 +98,7 @@ roughly what the major platforms use — it is why the same run reads differentl
 ## Licence
 
 MIT.
+
+## Standards
+
+Code in this repo follows the [shared standards](https://github.com/jakeflavin/portfolio/blob/main/docs/STANDARDS.md) and [layout](https://github.com/jakeflavin/portfolio/blob/main/docs/LAYOUT.md) used across the directory.
