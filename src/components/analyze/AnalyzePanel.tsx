@@ -190,11 +190,12 @@ export function AnalyzePanel({
         >
           <Suspense fallback={<div style={{ height: 132 }} />}>
             <ElevationChart
-              points={analysis.series.distance.map((distance, i) => ({
-                distance,
-                elevation: analysis.series.elevation[i],
-                gradient: analysis.series.gradient[i],
-              }))}
+              points={analysis.series.distance.flatMap((distance, i) => {
+                const elevation = analysis.series.elevation[i]
+                return elevation === undefined
+                  ? []
+                  : [{ distance, elevation, gradient: analysis.series.gradient[i] ?? 0 }]
+              })}
               path={activity.points}
               units={units}
               onHover={onHoverPoint}

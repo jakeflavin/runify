@@ -37,7 +37,11 @@ export function haversine(a: LatLng, b: LatLng): number {
 /** Total length of a path, in metres. */
 export function pathLength(points: LatLng[]): number {
   let total = 0
-  for (let i = 1; i < points.length; i++) total += haversine(points[i - 1], points[i])
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1]
+    const b = points[i]
+    if (a && b) total += haversine(a, b)
+  }
   return total
 }
 
@@ -46,7 +50,9 @@ export function cumulative(points: LatLng[]): number[] {
   const out = new Array<number>(points.length)
   let total = 0
   for (let i = 0; i < points.length; i++) {
-    if (i > 0) total += haversine(points[i - 1], points[i])
+    const back = points[i - 1]
+    const here = points[i]
+    if (i > 0 && back && here) total += haversine(back, here)
     out[i] = total
   }
   return out
@@ -101,7 +107,11 @@ export function simplify<T extends LatLng>(points: T[], toleranceMeters: number)
     let worst = 0
     let index = -1
     for (let i = first + 1; i < last; i++) {
-      const d = perpendicular(points[i], points[first], points[last])
+      const at = points[i]
+      const head = points[first]
+      const tail = points[last]
+      if (!at || !head || !tail) continue
+      const d = perpendicular(at, head, tail)
       if (d > worst) {
         worst = d
         index = i
@@ -186,13 +196,16 @@ export function interpolate(a: LatLng, b: LatLng, t: number): LatLng {
  */
 export function pointAt(points: LatLng[], meters: number): LatLng | null {
   if (points.length === 0) return null
-  if (meters <= 0) return points[0]
+  if (meters <= 0) return points[0] ?? null
 
   let travelled = 0
   for (let i = 1; i < points.length; i++) {
-    const leg = haversine(points[i - 1], points[i])
+    const a = points[i - 1]
+    const b = points[i]
+    if (!a || !b) continue
+    const leg = haversine(a, b)
     if (travelled + leg >= meters) {
-      return interpolate(points[i - 1], points[i], leg === 0 ? 0 : (meters - travelled) / leg)
+      return interpolate(a, b, leg === 0 ? 0 : (meters - travelled) / leg)
     }
     travelled += leg
   }
@@ -204,7 +217,9 @@ export function nearestIndex(points: LatLng[], target: LatLng): number {
   let best = -1
   let bestDistance = Infinity
   for (let i = 0; i < points.length; i++) {
-    const d = haversine(points[i], target)
+    const at = points[i]
+    if (!at) continue
+    const d = haversine(at, target)
     if (d < bestDistance) {
       bestDistance = d
       best = i

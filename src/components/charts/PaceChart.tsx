@@ -54,14 +54,14 @@ export function PaceChart({
    * running nor stopped, and a handful of them is enough to flatten the whole chart. Twice
    * the median is not a pace this runner ran.
    */
-  const ceiling = median * 2
+  const ceiling = (median ?? 0) * 2
 
   // Rows are kept but their pace goes null outside that, so the line *breaks* at a stop
   // rather than drawing a spike down and back. A gap is what actually happened.
   const data = distances.map((distance, i) => ({
     x: toDistance(distance, units),
     meters: distance,
-    pace: Number.isFinite(paces[i]) && paces[i] <= ceiling ? paces[i] : null,
+    pace: Number.isFinite(paces[i]) && (paces[i] ?? Infinity) <= ceiling ? (paces[i] ?? null) : null,
     hr: heartRates?.[i] ?? null,
   }))
 
@@ -71,7 +71,7 @@ export function PaceChart({
   const sorted = [...kept].sort((a, b) => a - b)
   const low = sorted[Math.floor(sorted.length * 0.02)]
   const high = sorted[Math.floor(sorted.length * 0.98)]
-  const pad = Math.max(5, (high - low) * 0.15)
+  const pad = Math.max(5, ((high ?? 0) - (low ?? 0)) * 0.15)
   const hasHr = data.some((row) => row.hr !== null)
 
   return (
@@ -101,7 +101,7 @@ export function PaceChart({
             width={46}
             // Reversed: faster is up.
             reversed
-            domain={[Math.max(0, low - pad), high + pad]}
+            domain={[Math.max(0, (low ?? 0) - pad), (high ?? 0) + pad]}
             tickFormatter={formatPace}
             tickLine={false}
             axisLine={false}
@@ -122,7 +122,8 @@ export function PaceChart({
             cursor={{ stroke: 'var(--line-strong)', strokeWidth: 1 }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null
-              const point = payload[0].payload as (typeof data)[number]
+              const point = payload[0]?.payload as (typeof data)[number] | undefined
+    if (!point) return null
               return (
                 <div className="tooltip">
                   <div>

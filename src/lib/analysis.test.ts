@@ -61,7 +61,7 @@ describe('analyse', () => {
 
   it('cuts one split per kilometre', () => {
     expect(flat.splits).toHaveLength(5)
-    expect(flat.splits[0].pace).toBeCloseTo(300, 0)
+    expect(flat.splits[0]?.pace).toBeCloseTo(300, 0)
   })
 
   it('notices which channels the file actually carried', () => {
@@ -130,7 +130,7 @@ describe('timeInZones', () => {
     const run = straightRun({ meters: 2000, secondsPerMeter: 0.3, hr: 150 })
     const zones = timeInZones(run.points, 200) // 75% of max → zone 3
     expect(zones[2]).toBeGreaterThan(0)
-    expect(zones[0] + zones[1] + zones[3] + zones[4]).toBe(0)
+    expect((zones[0] ?? 0) + (zones[1] ?? 0) + (zones[3] ?? 0) + (zones[4] ?? 0)).toBe(0)
   })
 
   it('is all zeroes when nothing was recorded', () => {

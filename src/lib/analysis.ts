@@ -79,10 +79,25 @@ function speeds(points: TrackPoint[], distances: number[], windowSeconds = 10): 
     if (p.time === undefined) return 0
     let from = i
     let to = i
-    while (from > 0 && (p.time - points[from].time!) / 1000 < windowSeconds / 2) from--
-    while (to < points.length - 1 && (points[to].time! - p.time) / 1000 < windowSeconds / 2) to++
-    const dt = (points[to].time! - points[from].time!) / 1000
-    return dt > 0 ? (distances[to] - distances[from]) / dt : 0
+    // Indexed reads are checked, so each end of the window is resolved to a value before
+    // it is compared. The walk is unchanged: the same conditions, read off the point
+    // rather than off the array a second time.
+    while (from > 0) {
+      const prev = points[from]
+      if (prev?.time === undefined || (p.time - prev.time) / 1000 >= windowSeconds / 2) break
+      from--
+    }
+    while (to < points.length - 1) {
+      const next = points[to]
+      if (next?.time === undefined || (next.time - p.time) / 1000 >= windowSeconds / 2) break
+      to++
+    }
+    const start = points[from]
+    const end = points[to]
+    if (start?.time === undefined || end?.time === undefined) return 0
+    const dt = (end.time - start.time) / 1000
+    const spanned = (distances[to] ?? 0) - (distances[from] ?? 0)
+    return dt > 0 ? spanned / dt : 0
   })
 }
 
@@ -99,21 +114,24 @@ function stoppedMask(points: TrackPoint[], speed: number[], windowSeconds = 10):
   if (speed.length === 0) return mask
 
   for (let i = 1; i < points.length; i++) {
-    const dt = (points[i].time! - points[i - 1].time!) / 1000
+    const cur = points[i]
+    const prev = points[i - 1]
+    if (!cur || !prev || cur.time === undefined || prev.time === undefined) continue
+    const dt = (cur.time - prev.time) / 1000
     if (dt <= 0) continue
-    const raw = haversine(points[i - 1], points[i]) / dt
+    const raw = haversine(prev, cur) / dt
     if (raw >= MOVING_THRESHOLD) continue
 
     // Spread the mark across everything whose window can see this pause.
     mask[i] = true
-    for (let j = i - 1; j >= 0 && (points[i].time! - points[j].time!) / 1000 <= windowSeconds; j--) {
+    for (let j = i - 1; j >= 0; j--) {
+      const back = points[j]
+      if (back?.time === undefined || (cur.time - back.time) / 1000 > windowSeconds) break
       mask[j] = true
     }
-    for (
-      let j = i + 1;
-      j < points.length && (points[j].time! - points[i].time!) / 1000 <= windowSeconds;
-      j++
-    ) {
+    for (let j = i + 1; j < points.length; j++) {
+      const ahead = points[j]
+      if (ahead?.time === undefined || (ahead.time - cur.time) / 1000 > windowSeconds) break
       mask[j] = true
     }
   }
@@ -135,14 +153,22 @@ export function analyse(activity: Activity, units: UnitSystem): Analysis {
   const elevation = summarise(hasElevation ? elevations : [])
   const gradient = hasElevation ? gradients(distance, elevations) : distance.map(() => 0)
 
-  const elapsed = hasTime ? (points[points.length - 1].time! - points[0].time!) / 1000 : 0
+  const firstPoint = points[0]
+  const lastPoint = points[points.length - 1]
+  const elapsed =
+    hasTime && firstPoint?.time !== undefined && lastPoint?.time !== undefined
+      ? (lastPoint.time - firstPoint.time) / 1000
+      : 0
 
   // Moving time: sum the gaps in which the runner was actually moving.
   const speed = hasTime ? speeds(points, distance) : []
   let movingTime = 0
   if (hasTime) {
     for (let i = 1; i < points.length; i++) {
-      if (speed[i] >= MOVING_THRESHOLD) movingTime += (points[i].time! - points[i - 1].time!) / 1000
+      const cur = points[i]
+      const prev = points[i - 1]
+      if (cur?.time === undefined || prev?.time === undefined) continue
+      if ((speed[i] ?? 0) >= MOVING_THRESHOLD) movingTime += (cur.time - prev.time) / 1000
     }
   }
 
@@ -152,7 +178,8 @@ export function analyse(activity: Activity, units: UnitSystem): Analysis {
   // Grade-adjusted average: weight each metre by how hard that metre's grade made it.
   let adjustedMeters = 0
   for (let i = 1; i < points.length; i++) {
-    adjustedMeters += (distance[i] - distance[i - 1]) * gradeFactor(gradient[i])
+    const step = (distance[i] ?? 0) - (distance[i - 1] ?? 0)
+    adjustedMeters += step * gradeFactor(gradient[i] ?? 0)
   }
   const gradeAdjustedPace =
     movingTime > 0 && adjustedMeters > 0 ? (movingTime / adjustedMeters) * per : Infinity
@@ -181,7 +208,10 @@ export function analyse(activity: Activity, units: UnitSystem): Analysis {
       elevation: elevation.series.length ? elevation.series : elevations,
       pace: speed.map((s, i) => (!stopped[i] && s >= MOVING_THRESHOLD ? per / s : Infinity)),
       gradient,
-      time: hasTime ? points.map((p) => (p.time! - points[0].time!) / 1000) : [],
+      time:
+        hasTime && firstPoint?.time !== undefined
+          ? points.map((p) => (p.time === undefined ? 0 : (p.time - firstPoint.time!) / 1000))
+          : [],
     },
     hasTime,
     hasElevation,
@@ -224,21 +254,26 @@ function splitBy(
     for (let i = 1; i < points.length; i++) {
       const segFrom = distance[i - 1]
       const segTo = distance[i]
+      if (segFrom === undefined || segTo === undefined) continue
       if (segTo <= from || segFrom >= to) continue
 
       const legLength = segTo - segFrom
       // Fraction of this sample's leg that lies inside the split.
       const share = legLength > 0 ? (Math.min(segTo, to) - Math.max(segFrom, from)) / legLength : 1
 
-      seconds += ((points[i].time! - points[i - 1].time!) / 1000) * share
-      adjusted += legLength * share * gradeFactor(gradient[i])
+      const cur = points[i]
+      const prev = points[i - 1]
+      if (cur?.time !== undefined && prev?.time !== undefined) {
+        seconds += ((cur.time - prev.time) / 1000) * share
+      }
+      adjusted += legLength * share * gradeFactor(gradient[i] ?? 0)
 
-      const rise = (points[i].ele ?? 0) - (points[i - 1].ele ?? 0)
+      const rise = (cur?.ele ?? 0) - (prev?.ele ?? 0)
       if (rise > 0) gain += rise * share
       else loss -= rise * share
 
-      if (points[i].hr !== undefined) hrs.push(points[i].hr!)
-      if (points[i].cad) cads.push(points[i].cad!)
+      if (cur?.hr !== undefined) hrs.push(cur.hr)
+      if (cur?.cad) cads.push(cur.cad)
     }
 
     const meters = to - from
@@ -262,12 +297,15 @@ function splitBy(
 export function timeInZones(points: TrackPoint[], maxHr: number): number[] {
   const buckets = [0, 0, 0, 0, 0]
   for (let i = 1; i < points.length; i++) {
-    const { hr, time } = points[i]
-    if (hr === undefined || time === undefined || points[i - 1].time === undefined) continue
-    const dt = (time - points[i - 1].time!) / 1000
+    const sample = points[i]
+    const before = points[i - 1]
+    if (!sample || !before) continue
+    const { hr, time } = sample
+    if (hr === undefined || time === undefined || before.time === undefined) continue
+    const dt = (time - before.time) / 1000
     const fraction = hr / maxHr
     const zone = fraction < 0.6 ? 0 : fraction < 0.7 ? 1 : fraction < 0.8 ? 2 : fraction < 0.9 ? 3 : 4
-    buckets[zone] += dt
+    buckets[zone] = (buckets[zone] ?? 0) + dt
   }
   return buckets
 }

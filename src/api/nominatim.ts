@@ -44,16 +44,16 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
 
     return {
       id: row.place_id,
-      name: row.name || parts[0],
+      name: row.name || parts[0] || row.display_name,
       detail: parts.slice(1).join(', '),
       lat: Number(row.lat),
       lon: Number(row.lon),
       bounds:
         box && box.length === 4 && box.every(Number.isFinite)
-          ? [
-              [box[0], box[2]],
-              [box[1], box[3]],
-            ]
+          ? ([
+              [box[0] ?? 0, box[2] ?? 0],
+              [box[1] ?? 0, box[3] ?? 0],
+            ] as [[number, number], [number, number]])
           : undefined,
     }
   })

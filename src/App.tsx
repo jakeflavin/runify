@@ -242,11 +242,11 @@ function paceColors(analysis: ReturnType<typeof analyse> | null): string[] | und
   const cuts = [at(0.2), at(0.4), at(0.6), at(0.8)]
   const ramp = ['#ffb300', '#fc7a00', '#fc5200', '#c93f00', '#8a2c00']
 
-  return paces.map((pace) => {
+  return paces.map((pace): string => {
     if (!Number.isFinite(pace)) return '#9aa4ad' // stopped
     // Lower pace is faster, so the first band is the brightest.
-    for (let i = 0; i < cuts.length; i++) if (pace <= cuts[i]) return ramp[i]
-    return ramp[4]
+    for (let i = 0; i < cuts.length; i++) if (pace <= (cuts[i] ?? Infinity)) return ramp[i] ?? '#8a2c00'
+    return ramp[4] ?? '#8a2c00'
   })
 }
 

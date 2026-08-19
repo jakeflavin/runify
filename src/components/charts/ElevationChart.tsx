@@ -92,7 +92,8 @@ export function ElevationChart({
             cursor={{ stroke: 'var(--line-strong)', strokeWidth: 1 }}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null
-              const point = payload[0].payload as (typeof data)[number]
+              const point = payload[0]?.payload as (typeof data)[number] | undefined
+    if (!point) return null
               return (
                 <div className="tooltip">
                   <div>

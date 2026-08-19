@@ -26,14 +26,14 @@ export function HrZones({ seconds, maxHr }: { seconds: number[]; maxHr: number }
             <div
               className="zone-fill"
               style={{
-                width: `${peak > 0 ? (seconds[i] / peak) * 100 : 0}%`,
+                width: `${peak > 0 ? ((seconds[i] ?? 0) / peak) * 100 : 0}%`,
                 background: zone.color,
               }}
             />
           </div>
           <div style={{ textAlign: 'right' }}>
-            {formatDuration(seconds[i])}
-            <span className="muted"> {Math.round((seconds[i] / total) * 100)}%</span>
+            {formatDuration(seconds[i] ?? 0)}
+            <span className="muted"> {Math.round(((seconds[i] ?? 0) / total) * 100)}%</span>
           </div>
         </div>
       ))}

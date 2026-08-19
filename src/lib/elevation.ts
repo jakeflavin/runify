@@ -24,7 +24,7 @@ export function smooth(values: number[], window = SMOOTH_WINDOW): number[] {
     const from = Math.max(0, i - half)
     const to = Math.min(values.length - 1, i + half)
     let sum = 0
-    for (let j = from; j <= to; j++) sum += values[j]
+    for (let j = from; j <= to; j++) sum += values[j] ?? 0
     return sum / (to - from + 1)
   })
 }
@@ -49,9 +49,9 @@ export function summarise(elevations: number[], threshold = THRESHOLD_METERS): E
 
   // `anchor` is the last elevation we committed to. Movement away from it only counts once
   // it exceeds the threshold, at which point the anchor jumps and we start measuring again.
-  let anchor = series[0]
+  let anchor = series[0] ?? 0
   for (const value of series) {
-    const delta = value - anchor
+    const delta = (value ?? 0) - anchor
     if (delta >= threshold) {
       gain += delta
       anchor = value
@@ -73,9 +73,11 @@ export function gradients(distances: number[], elevations: number[], windowMeter
   return distances.map((d, i) => {
     let from = i
     let to = i
-    while (from > 0 && d - distances[from] < windowMeters / 2) from--
-    while (to < distances.length - 1 && distances[to] - d < windowMeters / 2) to++
-    const run = distances[to] - distances[from]
-    return run > 0 ? (series[to] - series[from]) / run : 0
+    // Each end of the window is resolved before it is compared; the walk is otherwise
+    // unchanged.
+    while (from > 0 && d - (distances[from] ?? 0) < windowMeters / 2) from--
+    while (to < distances.length - 1 && (distances[to] ?? 0) - d < windowMeters / 2) to++
+    const run = (distances[to] ?? 0) - (distances[from] ?? 0)
+    return run > 0 ? ((series[to] ?? 0) - (series[from] ?? 0)) / run : 0
   })
 }

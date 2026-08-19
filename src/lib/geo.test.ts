@@ -65,8 +65,8 @@ describe('decodePolyline', () => {
   it('round-trips a known Google-encoded string at precision 5', () => {
     const points = decodePolyline('_p~iF~ps|U_ulLnnqC_mqNvxq`@', 5)
     expect(points).toHaveLength(3)
-    expect(points[0].lat).toBeCloseTo(38.5, 5)
-    expect(points[0].lon).toBeCloseTo(-120.2, 5)
-    expect(points[2].lat).toBeCloseTo(43.252, 5)
+    expect(points[0]?.lat).toBeCloseTo(38.5, 5)
+    expect(points[0]?.lon).toBeCloseTo(-120.2, 5)
+    expect(points[2]?.lat).toBeCloseTo(43.252, 5)
   })
 })

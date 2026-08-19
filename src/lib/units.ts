@@ -79,9 +79,10 @@ export function parseDuration(input: string): number | null {
   const numbers = parts.map((p) => (p === '' ? 0 : Number(p)))
   if (numbers.some((n) => !Number.isFinite(n))) return null
 
-  if (numbers.length === 1) return numbers[0] * 60
-  if (numbers.length === 2) return numbers[0] * 60 + numbers[1]
-  return numbers[0] * 3600 + numbers[1] * 60 + numbers[2]
+  const [a = 0, b = 0, c = 0] = numbers
+  if (numbers.length === 1) return a * 60
+  if (numbers.length === 2) return a * 60 + b
+  return a * 3600 + b * 60 + c
 }
 
 /** The standard race distances, in metres, for the equivalent-performance table. */

@@ -56,7 +56,7 @@ describe('predictSplits', () => {
   it('cuts one split per unit, with the remainder last', () => {
     const splits = predictSplits(distances, elevations, 1000, 300)
     expect(splits).toHaveLength(3)
-    expect(splits[0].meters).toBeCloseTo(1000, 6)
+    expect(splits[0]?.meters).toBeCloseTo(1000, 6)
   })
 
   it('returns the requested pace on level ground', () => {
@@ -73,8 +73,8 @@ describe('predictSplits', () => {
   it('predicts the uphill split slower than the downhill one', () => {
     const climb = hill(3000, 10, 90)
     const splits = predictSplits(climb.distances, climb.elevations, 1000, 300)
-    expect(splits[0].pace).toBeGreaterThan(300)
-    expect(splits[2].pace).toBeLessThan(300)
+    expect(splits[0]?.pace).toBeGreaterThan(300)
+    expect(splits[2]?.pace).toBeLessThan(300)
   })
 
   it('sums to the route effort, so the splits agree with the headline finish time', () => {

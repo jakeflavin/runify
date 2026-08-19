@@ -59,8 +59,11 @@ export function useRoute(snap: boolean, costing: Costing) {
 
     const missing = []
     for (let i = 1; i < waypoints.length; i++) {
-      const id = key(waypoints[i - 1], waypoints[i], costing)
-      if (!cacheRef.current.has(id)) missing.push({ id, from: waypoints[i - 1], to: waypoints[i] })
+      const from = waypoints[i - 1]
+      const to = waypoints[i]
+      if (!from || !to) continue
+      const id = key(from, to, costing)
+      if (!cacheRef.current.has(id)) missing.push({ id, from, to })
     }
     if (missing.length === 0) {
       setRouting(false)
@@ -91,6 +94,7 @@ export function useRoute(snap: boolean, costing: Costing) {
     for (let i = 1; i < waypoints.length; i++) {
       const from = waypoints[i - 1]
       const to = waypoints[i]
+      if (!from || !to) continue
       const cached = snap ? cache.get(key(from, to, costing)) : undefined
       out.push(
         cached ?? {
@@ -109,9 +113,11 @@ export function useRoute(snap: boolean, costing: Costing) {
   /** The whole route as one continuous path, with each leg's duplicated join dropped. */
   const path = useMemo<LatLng[]>(() => {
     if (waypoints.length === 0) return []
-    if (legs.length === 0) return [{ lat: waypoints[0].lat, lon: waypoints[0].lon }]
+    const head = waypoints[0]
+    if (legs.length === 0) return head ? [{ lat: head.lat, lon: head.lon }] : []
 
-    const out: LatLng[] = [legs[0].shape[0]]
+    const start = legs[0]?.shape[0]
+    const out: LatLng[] = start ? [start] : []
     for (const leg of legs) out.push(...leg.shape.slice(1))
     return out
   }, [legs, waypoints])
@@ -143,7 +149,7 @@ export function useRoute(snap: boolean, costing: Costing) {
     closeLoop: useCallback(
       () =>
         commit((current) =>
-          current.length < 2 ? current : [...current, makeWaypoint(current[0])],
+          current.length < 2 || !current[0] ? current : [...current, makeWaypoint(current[0])],
         ),
       [commit],
     ),
@@ -169,7 +175,8 @@ export function useRoute(snap: boolean, costing: Costing) {
     undo: useCallback(() => {
       setHistory((past) => {
         if (past.length === 0) return past
-        setWaypoints(past[past.length - 1])
+        const previous = past[past.length - 1]
+        if (previous) setWaypoints(previous)
         return past.slice(0, -1)
       })
     }, []),

@@ -110,7 +110,9 @@ export async function heightProfile(
   if (shape.length > MAX_HEIGHT_POINTS) {
     // Still too many after simplifying: take an even sample, keeping both ends.
     const step = (shape.length - 1) / (MAX_HEIGHT_POINTS - 1)
-    shape = Array.from({ length: MAX_HEIGHT_POINTS }, (_, i) => shape[Math.round(i * step)])
+    shape = Array.from({ length: MAX_HEIGHT_POINTS }, (_, i) => shape[Math.round(i * step)]).filter(
+      (p): p is (typeof shape)[number] => p !== undefined,
+    )
   }
 
   const body = { shape: shape.map((p) => ({ lat: p.lat, lon: p.lon })) }

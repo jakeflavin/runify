@@ -154,10 +154,10 @@ export function PlanPanel({
             <div style={{ marginTop: 14 }}>
               <Suspense fallback={<div style={{ height: 132 }} />}>
                 <ElevationChart
-                  points={profile.distances.map((distance, i) => ({
-                    distance,
-                    elevation: profile.series[i],
-                  }))}
+                  points={profile.distances.flatMap((distance, i) => {
+                    const elevation = profile.series[i]
+                    return elevation === undefined ? [] : [{ distance, elevation }]
+                  })}
                   path={route.path}
                   units={units}
                   onHover={onHoverPoint}

@@ -53,17 +53,17 @@ describe('GPX', () => {
 
   it('reads position, elevation and time', () => {
     expect(activity.points).toHaveLength(2)
-    expect(activity.points[0].lat).toBeCloseTo(40.7128, 6)
-    expect(activity.points[0].ele).toBe(10)
-    expect(activity.points[0].time).toBe(Date.parse('2026-04-01T12:00:00Z'))
+    expect(activity.points[0]?.lat).toBeCloseTo(40.7128, 6)
+    expect(activity.points[0]?.ele).toBe(10)
+    expect(activity.points[0]?.time).toBe(Date.parse('2026-04-01T12:00:00Z'))
   })
 
   it('finds heart rate inside the Garmin extension namespace', () => {
-    expect(activity.points[0].hr).toBe(140)
+    expect(activity.points[0]?.hr).toBe(140)
   })
 
   it('doubles a one-foot cadence to steps per minute', () => {
-    expect(activity.points[0].cad).toBe(170)
+    expect(activity.points[0]?.cad).toBe(170)
   })
 })
 
@@ -79,7 +79,7 @@ describe('TCX', () => {
   })
 
   it('reads heart rate out of the nested Value element', () => {
-    expect(activity.points[0].hr).toBe(142)
+    expect(activity.points[0]?.hr).toBe(142)
   })
 })
 
@@ -106,7 +106,7 @@ describe('toGpx', () => {
     const round = parseActivityFile(xml, 'x')
     expect(round.name).toBe('Test route')
     expect(round.points).toHaveLength(2)
-    expect(round.points[1].lon).toBeCloseTo(-74.005, 6)
+    expect(round.points[1]?.lon).toBeCloseTo(-74.005, 6)
   })
 
   it('escapes a name that would otherwise break the document', () => {

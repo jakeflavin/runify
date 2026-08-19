@@ -27,7 +27,7 @@ export function effortLength(distances: number[], elevations: number[]): number 
   const grade = gradients(distances, elevations)
   let total = 0
   for (let i = 1; i < distances.length; i++) {
-    total += (distances[i] - distances[i - 1]) * gradeFactor(grade[i])
+    total += ((distances[i] ?? 0) - (distances[i - 1] ?? 0)) * gradeFactor(grade[i] ?? 0)
   }
   return total
 }
@@ -62,12 +62,13 @@ export function predictSplits(
     for (let i = 1; i < distances.length; i++) {
       const segFrom = distances[i - 1]
       const segTo = distances[i]
+      if (segFrom === undefined || segTo === undefined) continue
       if (segTo <= from || segFrom >= to) continue
 
       const legLength = segTo - segFrom
       const share = legLength > 0 ? (Math.min(segTo, to) - Math.max(segFrom, from)) / legLength : 1
 
-      effort += legLength * share * gradeFactor(grade[i])
+      effort += legLength * share * gradeFactor(grade[i] ?? 0)
 
       const rise = (elevations[i] ?? 0) - (elevations[i - 1] ?? 0)
       if (rise > 0) gain += rise * share
