@@ -7,8 +7,7 @@
  * `public/favicon.svg`, and keep the two in step by hand — the mark is a stroked stride
  * over a rounded orange tile.
  */
-import { deflateSync } from 'node:zlib'
-import { writeFileSync } from 'node:fs'
+import { writeIcons } from './icon-png.mjs'
 
 const OUT = new URL('../public/', import.meta.url)
 
@@ -48,13 +47,9 @@ function insideTile(u, v, radius = 0.219) {
 }
 
 function render(size) {
-  // Raw RGB rows, each prefixed with a zero filter byte — the simplest valid PNG scanline.
-  const stride = size * 3 + 1
-  const raw = Buffer.alloc(stride * size)
+  const pixels = new Array(size * size)
 
   for (let y = 0; y < size; y++) {
-    const row = y * stride
-    raw[row] = 0
     const v = (y + 0.5) / size
 
     for (let x = 0; x < size; x++) {
@@ -68,55 +63,14 @@ function render(size) {
         if (onStroke || onHead) rgb = INK
       }
 
-      const at = row + 1 + x * 3
-      raw[at] = rgb[0]
-      raw[at + 1] = rgb[1]
-      raw[at + 2] = rgb[2]
+      pixels[y * size + x] = rgb
     }
   }
 
-  return png(size, raw)
+  return pixels
 }
 
 /** Assemble the four chunks a minimal PNG needs. */
-function png(size, raw) {
-  const chunk = (type, data) => {
-    const length = Buffer.alloc(4)
-    length.writeUInt32BE(data.length)
-    const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
-    const crc = Buffer.alloc(4)
-    crc.writeUInt32BE(crc32(body) >>> 0)
-    return Buffer.concat([length, body, crc])
-  }
-
-  const ihdr = Buffer.alloc(13)
-  ihdr.writeUInt32BE(size, 0)
-  ihdr.writeUInt32BE(size, 4)
-  ihdr[8] = 8 // bit depth
-  ihdr[9] = 2 // truecolour
-  
-
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', ihdr),
-    chunk('IDAT', deflateSync(raw, { level: 9 })),
-    chunk('IEND', Buffer.alloc(0)),
-  ])
-}
-
-const TABLE = Array.from({ length: 256 }, (_, n) => {
-  let c = n
-  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
-  return c >>> 0
-})
-
-function crc32(buffer) {
-  let c = 0xffffffff
-  for (const byte of buffer) c = TABLE[(c ^ byte) & 0xff] ^ (c >>> 8)
-  return c ^ 0xffffffff
-}
-
-for (const size of [180, 192, 512]) {
-  writeFileSync(new URL(`icon-${size}.png`, OUT), render(size))
+for (const size of writeIcons(OUT, [180, 192, 512], render)) {
   console.log(`wrote icon-${size}.png`)
 }
