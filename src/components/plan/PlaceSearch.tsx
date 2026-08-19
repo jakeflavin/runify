@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2, MapPin, Search, X } from 'lucide-react'
-import { searchPlaces, type Place } from '../../api/nominatim'
+import { searchPlaces, type Place } from '@/api/nominatim'
 
 const DEBOUNCE_MS = 400
 

@@ -15,9 +15,9 @@
 import { useEffect, useRef } from 'react'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { LatLng } from '../lib/geo'
-import type { Waypoint } from '../hooks/useRoute'
-import { useResolvedTheme } from '../hooks/useResolvedTheme'
+import type { LatLng } from '@/lib/geo'
+import type { Waypoint } from '@/hooks/useRoute'
+import { useResolvedTheme } from '@/hooks/useResolvedTheme'
 
 const BASEMAP = {
   light: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',

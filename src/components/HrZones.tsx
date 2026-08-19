@@ -7,8 +7,8 @@
  * visible even on a run that never left two of them.
  */
 
-import { HR_ZONES } from '../lib/pace'
-import { formatDuration } from '../lib/units'
+import { HR_ZONES } from '@/lib/pace'
+import { formatDuration } from '@/lib/units'
 
 export function HrZones({ seconds, maxHr }: { seconds: number[]; maxHr: number }) {
   const total = seconds.reduce((a, b) => a + b, 0)

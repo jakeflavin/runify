@@ -18,14 +18,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { pointAt, type LatLng } from '../../lib/geo'
+import { pointAt, type LatLng } from '@/lib/geo'
 import {
   formatDistance,
   formatPace,
   toDistance,
   unitLabels,
   type UnitSystem,
-} from '../../lib/units'
+} from '@/lib/units'
 
 export function PaceChart({
   distances,

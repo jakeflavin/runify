@@ -9,9 +9,9 @@
 
 import { useMemo, useState } from 'react'
 import { Flag, Timer } from 'lucide-react'
-import { Section, Segmented, Stat } from '../ui'
-import { SplitsTable } from '../SplitsTable'
-import { effortLength, predictSplits } from '../../lib/plan'
+import { Section, Segmented, Stat } from '@/components/ui'
+import { SplitsTable } from '@/components/SplitsTable'
+import { effortLength, predictSplits } from '@/lib/plan'
 import {
   RACES,
   formatDistance,
@@ -22,9 +22,9 @@ import {
   unitLabels,
   unitMeters,
   type UnitSystem,
-} from '../../lib/units'
-import { riegel } from '../../lib/pace'
-import type { RouteProfile } from '../../hooks/useElevationProfile'
+} from '@/lib/units'
+import { riegel } from '@/lib/pace'
+import type { RouteProfile } from '@/hooks/useElevationProfile'
 
 type Mode = 'pace' | 'time'
 

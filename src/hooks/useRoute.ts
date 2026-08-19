@@ -13,8 +13,8 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { haversine, pathLength, type LatLng } from '../lib/geo'
-import { routeLeg, type Costing, type RoutedLeg } from '../api/valhalla'
+import { haversine, pathLength, type LatLng } from '@/lib/geo'
+import { routeLeg, type Costing, type RoutedLeg } from '@/api/valhalla'
 
 export interface Waypoint extends LatLng {
   id: string

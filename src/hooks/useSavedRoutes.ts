@@ -9,7 +9,7 @@
 
 import { useCallback } from 'react'
 import { usePersistentState } from './usePersistentState'
-import type { LatLng } from '../lib/geo'
+import type { LatLng } from '@/lib/geo'
 
 export interface SavedRoute {
   id: string

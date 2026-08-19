@@ -9,18 +9,18 @@
 
 import { Suspense, lazy, useMemo } from 'react'
 import { Heart, Repeat2, TrendingUp } from 'lucide-react'
-import { Section, Stat } from '../ui'
-import { SplitsTable } from '../SplitsTable'
-import { HrZones } from '../HrZones'
+import { Section, Stat } from '@/components/ui'
+import { SplitsTable } from '@/components/SplitsTable'
+import { HrZones } from '@/components/HrZones'
 // Deferred for the same reason as on the planning side: the charting library is only
 // needed once a file has actually been opened.
 const ElevationChart = lazy(() =>
-  import('../charts/ElevationChart').then((m) => ({ default: m.ElevationChart })),
+  import('@/components/charts/ElevationChart').then((m) => ({ default: m.ElevationChart })),
 )
-const PaceChart = lazy(() => import('../charts/PaceChart').then((m) => ({ default: m.PaceChart })))
-import { timeInZones, type Activity, type Analysis } from '../../lib/analysis'
-import { vdot } from '../../lib/pace'
-import type { LatLng } from '../../lib/geo'
+const PaceChart = lazy(() => import('@/components/charts/PaceChart').then((m) => ({ default: m.PaceChart })))
+import { timeInZones, type Activity, type Analysis } from '@/lib/analysis'
+import { vdot } from '@/lib/pace'
+import type { LatLng } from '@/lib/geo'
 import {
   formatDistance,
   formatDuration,
@@ -28,7 +28,7 @@ import {
   formatPace,
   unitLabels,
   type UnitSystem,
-} from '../../lib/units'
+} from '@/lib/units'
 
 export function AnalyzePanel({
   activity,

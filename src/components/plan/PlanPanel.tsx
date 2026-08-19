@@ -15,20 +15,20 @@ import {
   Trash2,
   Undo2,
 } from 'lucide-react'
-import { Section, Segmented, Stat, Switch } from '../ui'
+import { Section, Segmented, Stat, Switch } from '@/components/ui'
 import { PacePlanner } from './PacePlanner'
 import { SavedRoutes } from './SavedRoutes'
 // Recharts is a third of the bundle and nothing on the first screen needs it — the chart
 // only appears once a route has been drawn.
 const ElevationChart = lazy(() =>
-  import('../charts/ElevationChart').then((m) => ({ default: m.ElevationChart })),
+  import('@/components/charts/ElevationChart').then((m) => ({ default: m.ElevationChart })),
 )
-import type { useRoute } from '../../hooks/useRoute'
-import type { RouteProfile } from '../../hooks/useElevationProfile'
-import type { SavedRoute } from '../../hooks/useSavedRoutes'
-import type { Costing } from '../../api/valhalla'
-import type { LatLng } from '../../lib/geo'
-import { formatDistance, formatElevation, unitLabels, type UnitSystem } from '../../lib/units'
+import type { useRoute } from '@/hooks/useRoute'
+import type { RouteProfile } from '@/hooks/useElevationProfile'
+import type { SavedRoute } from '@/hooks/useSavedRoutes'
+import type { Costing } from '@/api/valhalla'
+import type { LatLng } from '@/lib/geo'
+import { formatDistance, formatElevation, unitLabels, type UnitSystem } from '@/lib/units'
 
 export function PlanPanel({
   route,

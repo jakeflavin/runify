@@ -9,7 +9,7 @@
  */
 
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { pointAt, type LatLng } from '../../lib/geo'
+import { pointAt, type LatLng } from '@/lib/geo'
 import {
   formatDistance,
   formatElevation,
@@ -17,7 +17,7 @@ import {
   toElevation,
   unitLabels,
   type UnitSystem,
-} from '../../lib/units'
+} from '@/lib/units'
 
 export interface ElevationPoint {
   /** Metres from the start. */

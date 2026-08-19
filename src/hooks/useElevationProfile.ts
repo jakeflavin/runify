@@ -8,9 +8,9 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import { cumulative, pathLength, type LatLng } from '../lib/geo'
-import { heightProfile } from '../api/valhalla'
-import { summarise, type ElevationSummary } from '../lib/elevation'
+import { cumulative, pathLength, type LatLng } from '@/lib/geo'
+import { heightProfile } from '@/api/valhalla'
+import { summarise, type ElevationSummary } from '@/lib/elevation'
 
 /** Round to ~11 m, so a fingerprint changes only when the route meaningfully moves. */
 const fingerprint = (path: LatLng[]) =>

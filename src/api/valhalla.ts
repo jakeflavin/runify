@@ -11,7 +11,7 @@
  * interface says which it got.
  */
 
-import { decodePolyline, simplify, type LatLng } from '../lib/geo'
+import { decodePolyline, simplify, type LatLng } from '@/lib/geo'
 
 const HOST = 'https://valhalla1.openstreetmap.de'
 

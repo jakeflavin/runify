@@ -7,14 +7,14 @@
  * is within a minute or so of the others and a zero-based bar makes them all look identical.
  */
 
-import type { Split } from '../lib/analysis'
+import type { Split } from '@/lib/analysis'
 import {
   formatDuration,
   formatElevation,
   formatPace,
   unitLabels,
   type UnitSystem,
-} from '../lib/units'
+} from '@/lib/units'
 
 export function SplitsTable({
   splits,

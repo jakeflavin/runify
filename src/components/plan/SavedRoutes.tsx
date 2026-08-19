@@ -1,7 +1,7 @@
 import { Trash2 } from 'lucide-react'
-import { Section } from '../ui'
-import type { SavedRoute } from '../../hooks/useSavedRoutes'
-import { formatDistance, unitLabels, type UnitSystem } from '../../lib/units'
+import { Section } from '@/components/ui'
+import type { SavedRoute } from '@/hooks/useSavedRoutes'
+import { formatDistance, unitLabels, type UnitSystem } from '@/lib/units'
 
 const when = (timestamp: number) =>
   new Date(timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })

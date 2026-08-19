@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { usePersistentState } from './usePersistentState'
-import type { UnitSystem } from '../lib/units'
-import { maxHrForAge } from '../lib/pace'
+import type { UnitSystem } from '@/lib/units'
+import { maxHrForAge } from '@/lib/pace'
 
 export type Theme = 'light' | 'dark' | 'system'
 
