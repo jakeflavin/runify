@@ -17,6 +17,49 @@ export const unitLabels = (units: UnitSystem) =>
     ? { distance: 'mi', elevation: 'ft', pace: '/mi', speed: 'mph' }
     : { distance: 'km', elevation: 'm', pace: '/km', speed: 'km/h' }
 
+/*
+ * Number formatting goes through Intl so the decimal mark follows the reader — 7,45 km
+ * in fr, 7.45 in en — and thousands are grouped the way they expect. The formatters are
+ * built once and reused: constructing one costs far more than using it, and these are
+ * called per split row and per chart tick.
+ */
+const fractional = new Map<number, Intl.NumberFormat>()
+const toDigits = (digits: number) => {
+  const existing = fractional.get(digits)
+  if (existing) return existing
+  const format = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
+  fractional.set(digits, format)
+  return format
+}
+
+const grouped = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 })
+
+/** A whole number, grouped. Any count the reader scans. */
+export const formatNumber = (value: number) => grouped.format(value)
+
+/** A number at a fixed precision — VDOT, a split fraction, anything with a decimal. */
+export const formatDecimal = (value: number, digits = 1) => toDigits(digits).format(value)
+
+/**
+ * A chart's distance axis: one decimal while the numbers are small, none once they are
+ * not, so the ticks stay the same width as the run gets longer.
+ */
+export const formatAxisDistance = (value: number) => toDigits(value < 10 ? 1 : 0).format(value)
+
+/*
+ * A gradient, given as a ratio rather than as a number already multiplied out — the
+ * formatter places the sign and the symbol, which is "%1,5" in tr and "1,5 %" in fr.
+ */
+const percent = new Intl.NumberFormat(undefined, {
+  style: 'percent',
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+})
+export const formatPercent = (ratio: number) => percent.format(ratio)
+
 /** Metres in one distance unit — the divisor for every per-unit figure. */
 export const unitMeters = (units: UnitSystem) => (units === 'imperial' ? MILE : 1000)
 
@@ -27,11 +70,13 @@ export const toElevation = (meters: number, units: UnitSystem) =>
 
 /** Distance, at the precision a runner actually reads: hundredths under a marathon. */
 export function formatDistance(meters: number, units: UnitSystem, digits = 2): string {
-  return toDistance(meters, units).toFixed(digits)
+  return toDigits(digits).format(toDistance(meters, units))
 }
 
 export function formatElevation(meters: number, units: UnitSystem): string {
-  return Math.round(toElevation(meters, units)).toLocaleString()
+  // Rounded before formatting rather than by the formatter, so a negative loss rounds
+  // the same way it always has.
+  return grouped.format(Math.round(toElevation(meters, units)))
 }
 
 /**
@@ -64,7 +109,7 @@ export const paceOf = (meters: number, seconds: number, units: UnitSystem) =>
   meters > 0 ? seconds / toDistance(meters, units) : Infinity
 
 export const formatSpeed = (metersPerSecond: number, units: UnitSystem) =>
-  ((metersPerSecond * 3600) / unitMeters(units)).toFixed(1)
+  toDigits(1).format((metersPerSecond * 3600) / unitMeters(units))
 
 /**
  * Parse `m:ss`, `h:mm:ss` or a bare number of minutes. Returns seconds, or null.

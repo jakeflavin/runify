@@ -17,6 +17,9 @@ import {
   toElevation,
   unitLabels,
   type UnitSystem,
+  formatAxisDistance,
+  formatNumber,
+  formatPercent,
 } from '@/lib/units'
 
 export interface ElevationPoint {
@@ -80,14 +83,14 @@ export function ElevationChart({
             dataKey="x"
             type="number"
             domain={['dataMin', 'dataMax']}
-            tickFormatter={(value: number) => value.toFixed(value < 10 ? 1 : 0)}
+            tickFormatter={formatAxisDistance}
             tickLine={false}
             axisLine={false}
             minTickGap={28}
           />
           <YAxis
             width={44}
-            tickFormatter={(value: number) => Math.round(value).toLocaleString()}
+            tickFormatter={(value: number) => formatNumber(Math.round(value))}
             tickLine={false}
             axisLine={false}
             // Elevation almost never starts at sea level, and forcing zero flattens every
@@ -118,7 +121,7 @@ export function ElevationChart({
                   {point.gradient !== undefined && (
                     <div>
                       <span className="k">Grade</span>
-                      <span className="v">{(point.gradient * 100).toFixed(1)}%</span>
+                      <span className="v">{formatPercent(point.gradient)}</span>
                     </div>
                   )}
                 </div>

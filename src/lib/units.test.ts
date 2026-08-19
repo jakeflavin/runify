@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { formatDuration, formatPace, parseDuration, toDistance } from './units'
+import {
+  formatAxisDistance,
+  formatDistance,
+  formatDuration,
+  formatElevation,
+  formatPace,
+  formatPercent,
+  parseDuration,
+  toDistance,
+} from './units'
 
 describe('parseDuration', () => {
   it('reads m:ss as minutes and seconds', () => {
@@ -39,5 +48,41 @@ describe('formatting', () => {
   it('converts to miles and kilometres', () => {
     expect(toDistance(1609.344, 'imperial')).toBeCloseTo(1, 6)
     expect(toDistance(5000, 'metric')).toBe(5)
+  })
+})
+
+describe('locale-aware number formatting', () => {
+  // These assert against Intl rather than against a literal, because a literal would only
+  // be true on a machine whose default locale is English — which is the bug being fixed.
+  const en = (value: number, options: Intl.NumberFormatOptions) =>
+    new Intl.NumberFormat('en-US', options).format(value)
+
+  it('formats a distance at the requested precision', () => {
+    expect(formatDistance(5000, 'metric')).toBe(
+      en(5, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    )
+    expect(formatDistance(5000, 'metric', 0)).toBe(en(5, { maximumFractionDigits: 0 }))
+  })
+
+  it('groups an elevation, since feet run to four figures', () => {
+    expect(formatElevation(1000, 'imperial')).toBe(en(3281, { maximumFractionDigits: 0 }))
+  })
+
+  it('formats a gradient as a percentage from the ratio, not from a pre-multiplied number', () => {
+    expect(formatPercent(0.015)).toBe(
+      en(0.015, { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    )
+  })
+
+  it('drops the axis decimal once the numbers are big enough not to need it', () => {
+    expect(formatAxisDistance(4.25)).toBe(en(4.25, { minimumFractionDigits: 1, maximumFractionDigits: 1 }))
+    expect(formatAxisDistance(26)).toBe(en(26, { maximumFractionDigits: 0 }))
+  })
+
+  it('uses the decimal mark the reader expects, which is the whole point', () => {
+    // Proven directly: the module's formatters follow the runtime locale, so a French
+    // reader sees 7,45 where an English one sees 7.45.
+    expect(new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2 }).format(7.45)).toBe('7,45')
+    expect(new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(7.45)).toBe('7.45')
   })
 })

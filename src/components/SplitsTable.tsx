@@ -9,6 +9,7 @@
 
 import type { Split } from '@/lib/analysis'
 import {
+  formatDecimal,
   formatDuration,
   formatElevation,
   formatPace,
@@ -59,7 +60,7 @@ export function SplitsTable({
                 {partial && (
                   <span className="muted">
                     {' '}
-                    · {(split.meters / (splits[0]?.meters ?? 1)).toFixed(2)}
+                    · {formatDecimal(split.meters / (splits[0]?.meters ?? 1), 2)}
                   </span>
                 )}
               </td>

@@ -24,6 +24,7 @@ import type { LatLng } from '@/lib/geo'
 import {
   formatDistance,
   formatDuration,
+  formatDecimal,
   formatElevation,
   formatPace,
   unitLabels,
@@ -134,7 +135,7 @@ export function AnalyzePanel({
               <Stat label="Cadence" value={analysis.avgCadence ?? '—'} unit="spm" size="sm" />
             )}
             {Number.isFinite(fitness) && (
-              <Stat label="VDOT" value={fitness.toFixed(1)} size="sm" sub="Daniels & Gilbert" />
+              <Stat label="VDOT" value={formatDecimal(fitness)} size="sm" sub="Daniels & Gilbert" />
             )}
           </div>
         )}

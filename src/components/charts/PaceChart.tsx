@@ -25,6 +25,7 @@ import {
   toDistance,
   unitLabels,
   type UnitSystem,
+  formatAxisDistance,
 } from '@/lib/units'
 
 export function PaceChart({
@@ -103,7 +104,7 @@ export function PaceChart({
             dataKey="x"
             type="number"
             domain={['dataMin', 'dataMax']}
-            tickFormatter={(value: number) => value.toFixed(value < 10 ? 1 : 0)}
+            tickFormatter={formatAxisDistance}
             tickLine={false}
             axisLine={false}
             minTickGap={28}
