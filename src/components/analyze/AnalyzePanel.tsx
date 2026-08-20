@@ -8,6 +8,7 @@
  */
 
 import { Suspense, lazy, useMemo } from 'react'
+import { Button, Chip, Muted, Row, StatRow } from '../ui.styled'
 import { Heart, Repeat2, TrendingUp } from 'lucide-react'
 import { Section, Stat } from '@/components/ui'
 import { SplitsTable } from '@/components/SplitsTable'
@@ -72,16 +73,16 @@ export function AnalyzePanel({
             : 'Activity'
         }
         action={
-          <button type="button" className="btn ghost sm" onClick={onReplace}>
+          <Button $ghost $small type="button"  onClick={onReplace}>
             <Repeat2 size={14} /> New file
-          </button>
+          </Button>
         }
       >
         <h1 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 14px', letterSpacing: '-0.01em' }}>
           {activity.name}
         </h1>
 
-        <div className="stat-row" style={{ marginBottom: 14 }}>
+        <StatRow  style={{ marginBottom: 14 }}>
           <Stat
             label="Distance"
             value={formatDistance(analysis.distance, units)}
@@ -94,9 +95,9 @@ export function AnalyzePanel({
             size="lg"
             sub={stopped > 30 ? `${formatDuration(stopped)} stopped` : undefined}
           />
-        </div>
+        </StatRow>
 
-        <div className="stat-row">
+        <StatRow>
           <Stat
             label="Pace"
             value={formatPace(analysis.avgPace)}
@@ -118,10 +119,10 @@ export function AnalyzePanel({
               unit={labels.elevation}
             />
           )}
-        </div>
+        </StatRow>
 
         {(analysis.hasHr || analysis.hasCadence || Number.isFinite(fitness)) && (
-          <div className="stat-row" style={{ marginTop: 14 }}>
+          <StatRow  style={{ marginTop: 14 }}>
             {analysis.hasHr && (
               <Stat
                 label="Avg HR"
@@ -137,7 +138,7 @@ export function AnalyzePanel({
             {Number.isFinite(fitness) && (
               <Stat label="VDOT" value={formatDecimal(fitness)} size="sm" sub="Daniels & Gilbert" />
             )}
-          </div>
+          </StatRow>
         )}
       </Section>
 
@@ -154,14 +155,14 @@ export function AnalyzePanel({
             />
           </Suspense>
           {analysis.hasHr && (
-            <div className="row" style={{ gap: 14, marginTop: 8, fontSize: 12 }}>
-              <span className="muted">
+            <Row  style={{ gap: 14, marginTop: 8, fontSize: 12 }}>
+              <Muted>
                 <span style={{ color: 'var(--s-pace)' }}>●</span> Pace
-              </span>
-              <span className="muted">
+              </Muted>
+              <Muted>
                 <span style={{ color: 'var(--s-hr)' }}>●</span> Heart rate
-              </span>
-            </div>
+              </Muted>
+            </Row>
           )}
         </Section>
       )}
@@ -181,11 +182,11 @@ export function AnalyzePanel({
         <Section
           title="Elevation"
           action={
-            <span className="chip">
+            <Chip>
               <TrendingUp size={11} aria-hidden="true" />+
               {formatElevation(analysis.elevation.gain, units)} / −
               {formatElevation(analysis.elevation.loss, units)} {labels.elevation}
-            </span>
+            </Chip>
           }
         >
           <Suspense fallback={<div style={{ height: 132 }} />}>
@@ -208,9 +209,9 @@ export function AnalyzePanel({
         <Section
           title="Heart rate zones"
           action={
-            <label className="row" style={{ gap: 6, fontSize: 12 }}>
-              <Heart size={12} className="muted" aria-hidden="true" />
-              <span className="muted">Max</span>
+            <Row as="label"  style={{ gap: 6, fontSize: 12 }}>
+              <Muted as={Heart} size={12} aria-hidden="true" />
+              <Muted>Max</Muted>
               <input
                 className="input"
                 style={{ width: 62, height: 26 }}
@@ -224,7 +225,7 @@ export function AnalyzePanel({
                   if (value >= 120 && value <= 230) setMaxHr(value)
                 }}
               />
-            </label>
+            </Row>
           }
         >
           <HrZones seconds={zones} maxHr={maxHr} />

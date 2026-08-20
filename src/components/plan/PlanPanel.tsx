@@ -3,6 +3,7 @@
  */
 
 import { Suspense, lazy, useState } from 'react'
+import { Button, Chip, Empty, Row, StatRow } from '../ui.styled'
 import {
   Bike,
   Download,
@@ -81,72 +82,68 @@ export function PlanPanel({
           />
         }
       >
-        <div className="row" style={{ marginBottom: 12 }}>
+        <Row  style={{ marginBottom: 12 }}>
           <Switch checked={snap} onChange={setSnap}>
             Follow roads and paths
           </Switch>
           {route.routing && (
-            <span className="chip">
+            <Chip>
               <Loader2 size={11} className="spin" aria-hidden="true" /> Routing
-            </span>
+            </Chip>
           )}
           {!route.routing && route.waypoints.length > 1 && snap && !route.fullySnapped && (
-            <span
-              className="chip"
-              title="The routing service could not snap every leg; those are straight lines."
-            >
+            <Chip
+              
+              title="The routing service could not snap every leg; those are straight lines.">
               Partly straight
-            </span>
+            </Chip>
           )}
-        </div>
+        </Row>
 
-        <div className="row">
-          <button type="button" className="btn sm" onClick={route.undo} disabled={!route.canUndo}>
+        <Row>
+          <Button $small type="button"  onClick={route.undo} disabled={!route.canUndo}>
             <Undo2 size={14} /> Undo
-          </button>
-          <button
+          </Button>
+          <Button $small
             type="button"
-            className="btn sm"
+            
             onClick={route.closeLoop}
             disabled={route.waypoints.length < 2}
-            title="Add a leg back to the start"
-          >
+            title="Add a leg back to the start">
             <Repeat size={14} /> Loop
-          </button>
-          <button
+          </Button>
+          <Button $small
             type="button"
-            className="btn sm"
+            
             onClick={route.outAndBack}
             disabled={route.waypoints.length < 2}
-            title="Retrace the route back to the start"
-          >
+            title="Retrace the route back to the start">
             <Redo2 size={14} /> Out &amp; back
-          </button>
-          <button
+          </Button>
+          <Button $small
             type="button"
-            className="btn sm"
+            
             onClick={route.reverse}
-            disabled={route.waypoints.length < 2}
-          >
+            disabled={route.waypoints.length < 2}>
             <RotateCcw size={14} /> Reverse
-          </button>
-          <button type="button" className="btn sm danger" onClick={route.clear} disabled={empty}>
+          </Button>
+          <Button $small $danger type="button"  onClick={route.clear} disabled={empty}>
             <Trash2 size={14} /> Clear
-          </button>
-        </div>
+          </Button>
+        </Row>
 
         {empty && (
-          <p className="empty" style={{ paddingBottom: 0 }}>
+          <Empty as="p"  style={{ paddingBottom: 0 }}>
             Click the map to drop your start, then keep clicking to build the route.
             <br />
             Drag any pin to move it; click a pin to remove it.
-          </p>
+          </Empty>
         )}
       </Section>
 
       {!empty && (
         <Section title="The route">
-          <div className="stat-row">
+          <StatRow>
             <Stat
               label="Distance"
               value={formatDistance(route.meters, units)}
@@ -160,7 +157,7 @@ export function PlanPanel({
               sub={profile ? `−${formatElevation(profile.loss, units)} down` : undefined}
             />
             <Stat label="Waypoints" value={route.waypoints.length} />
-          </div>
+          </StatRow>
 
           {/* A route with no length has no profile to draw — every sample sits at the same
               place, and the chart would render a flat line across a zero-wide axis. */}
@@ -186,7 +183,7 @@ export function PlanPanel({
 
       {!empty && (
         <Section title="Keep it">
-          <div className="row">
+          <Row>
             <input
               className="input"
               style={{ flex: 1, minWidth: 140 }}
@@ -201,20 +198,19 @@ export function PlanPanel({
                 }
               }}
             />
-            <button
+            <Button $primary
               type="button"
-              className="btn primary"
+              
               onClick={() => {
                 onSave(name)
                 setName('')
-              }}
-            >
+              }}>
               <Save size={14} /> Save
-            </button>
-            <button type="button" className="btn" onClick={onExport} title="Download as GPX">
+            </Button>
+            <Button type="button"  onClick={onExport} title="Download as GPX">
               <Download size={14} /> GPX
-            </button>
-          </div>
+            </Button>
+          </Row>
         </Section>
       )}
 

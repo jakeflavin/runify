@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
+import { Button } from './components/ui.styled'
+import { Masthead, MastheadSpacer, Rail, Shell, Stage, Workspace, Wordmark } from './App.styled'
 import { Activity as ActivityIcon, Moon, PenLine, Sun } from 'lucide-react'
 import { RouteMap, type MapFocus } from './components/RouteMap'
 import { Section, Segmented } from './components/ui'
@@ -64,12 +66,12 @@ export default function App() {
   )
 
   return (
-    <div className="app">
-      <header className="masthead">
-        <div className="wordmark">
+    <Shell>
+      <Masthead>
+        <Wordmark>
           <Mark />
           <span>Runify</span>
-        </div>
+        </Wordmark>
 
         <Segmented<Mode>
           label="Mode"
@@ -82,7 +84,7 @@ export default function App() {
           ]}
         />
 
-        <div className="masthead-spacer" />
+        <MastheadSpacer />
 
         <Segmented<UnitSystem>
           label="Units"
@@ -94,23 +96,22 @@ export default function App() {
           ]}
         />
 
-        <button
+        <Button $ghost $icon
           type="button"
-          className="btn ghost icon"
+          
           title={`Theme: ${theme}`}
           aria-label={`Theme: ${theme}. Change it.`}
           onClick={() =>
             setTheme((current: Theme) =>
               current === 'dark' ? 'light' : current === 'light' ? 'system' : 'dark',
             )
-          }
-        >
+          }>
           {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
-        </button>
-      </header>
+        </Button>
+      </Masthead>
 
-      <div className="workspace">
-        <div className="stage">
+      <Workspace>
+        <Stage>
           <RouteMap
             path={path}
             waypoints={planning ? route.waypoints : undefined}
@@ -144,9 +145,9 @@ export default function App() {
               </div>
             </div>
           )}
-        </div>
+        </Stage>
 
-        <aside className="rail">
+        <Rail>
           {planning ? (
             <PlanPanel
               route={route}
@@ -187,9 +188,9 @@ export default function App() {
               <FileDrop onFile={handleFile} error={parseFailure} />
             </Section>
           )}
-        </aside>
-      </div>
-    </div>
+        </Rail>
+      </Workspace>
+    </Shell>
   )
 }
 

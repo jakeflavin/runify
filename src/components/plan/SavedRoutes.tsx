@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react'
+import { Button } from '../ui.styled'
 import { Section } from '@/components/ui'
 import type { SavedRoute } from '@/hooks/useSavedRoutes'
 import { formatDistance, unitLabels, type UnitSystem } from '@/lib/units'
@@ -42,14 +43,13 @@ export function SavedRoutes({
                 {formatDistance(route.meters, units)} {labels.distance} · {when(route.savedAt)}
               </span>
             </button>
-            <button
+            <Button $ghost $small $icon $danger
               type="button"
-              className="btn ghost sm icon danger"
+              
               aria-label={`Delete ${route.name}`}
-              onClick={() => onRemove(route.id)}
-            >
+              onClick={() => onRemove(route.id)}>
               <Trash2 size={14} />
-            </button>
+            </Button>
           </div>
         ))}
       </div>

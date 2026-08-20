@@ -8,6 +8,7 @@
  */
 
 import { useMemo, useState } from 'react'
+import { Empty, Grid2, Muted, StatRow } from '../ui.styled'
 import { Flag, Timer } from 'lucide-react'
 import { Section, Segmented, Stat } from '@/components/ui'
 import { SplitsTable } from '@/components/SplitsTable'
@@ -93,7 +94,7 @@ export function PacePlanner({
           />
         }
       >
-        <div className="grid-2" style={{ marginBottom: 14 }}>
+        <Grid2  style={{ marginBottom: 14 }}>
           <div className="field">
             <label htmlFor="plan-pace">Flat pace {labels.pace}</label>
             <input
@@ -122,9 +123,9 @@ export function PacePlanner({
               onChange={(event) => setTimeText(event.target.value)}
             />
           </div>
-        </div>
+        </Grid2>
 
-        <div className="stat-row">
+        <StatRow>
           <Stat label="Finish" value={formatDuration(finish)} size="lg" tone="var(--brand)" />
           <Stat
             label="Average pace"
@@ -132,22 +133,22 @@ export function PacePlanner({
             unit={labels.pace}
             sub={terrainDescription(terrainFactor, flatPace)}
           />
-        </div>
+        </StatRow>
 
         {!profile && (
-          <p className="muted" style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
+          <Muted as="p"  style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
             No terrain data for this route yet — these figures assume it is flat.
-          </p>
+          </Muted>
         )}
       </Section>
 
       {splits.length > 0 && (
         <Section title={`Predicted splits · ${splits.length} ${labels.distance}`}>
           <SplitsTable splits={splits} units={units} showGap />
-          <p className="muted" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+          <Muted as="p"  style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
             Each split is the pace the terrain will produce while you hold the same effort. GAP
             stays fixed — that is the effort you asked for.
-          </p>
+          </Muted>
         </Section>
       )}
 
@@ -193,9 +194,9 @@ function RaceEquivalents({
 }) {
   if (!Number.isFinite(seconds) || seconds <= 0 || meters < 1000) {
     return (
-      <p className="empty" style={{ padding: '8px 0' }}>
+      <Empty as="p"  style={{ padding: '8px 0' }}>
         Draw a longer route to see race equivalents.
-      </p>
+      </Empty>
     )
   }
 
@@ -217,16 +218,16 @@ function RaceEquivalents({
             <tr key={race.name}>
               <td>
                 {race.name}
-                <span className="muted">
+                <Muted>
                   {' '}
                   · {formatDistance(race.meters, units, 1)} {labels.distance}
-                </span>
+                </Muted>
               </td>
               <td className="num">{formatDuration(predicted)}</td>
-              <td className="muted">
+              <Muted as="td">
                 {formatPace(predicted / toDistance(race.meters, units))}
                 {labels.pace}
-              </td>
+              </Muted>
             </tr>
           )
         })}

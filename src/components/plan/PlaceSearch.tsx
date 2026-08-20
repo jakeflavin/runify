@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+import { Button, Muted, Panel } from '../ui.styled'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2, MapPin, Search, X } from 'lucide-react'
 import { searchPlaces, type Place } from '@/api/nominatim'
@@ -46,7 +47,7 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
   return (
     <div ref={box} style={{ position: 'relative', flex: 1, minWidth: 180, maxWidth: 320 }}>
       <div className="floating" style={{ borderRadius: 8, padding: '0 8px' }}>
-        <Search size={15} className="muted" aria-hidden="true" />
+        <Muted as={Search} size={15} aria-hidden="true" />
         <input
           className="input"
           style={{ border: 'none', background: 'transparent', height: 36 }}
@@ -67,33 +68,31 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
           }}
         />
         {isFetching ? (
-          <Loader2 size={14} className="muted spin" aria-hidden="true" />
+          <Muted as={Loader2} size={14} className="spin" aria-hidden="true" />
         ) : text ? (
-          <button
+          <Button $ghost $small $icon
             type="button"
-            className="btn ghost sm icon"
+            
             aria-label="Clear search"
             onClick={() => {
               setText('')
               setOpen(false)
-            }}
-          >
+            }}>
             <X size={14} />
-          </button>
+          </Button>
         ) : null}
       </div>
 
       {open && results.length > 0 && (
-        <div
-          className="panel"
+        <Panel
+          
           style={{
             position: 'absolute',
             top: 44,
             left: 0,
             right: 0,
             boxShadow: 'var(--shadow-float)',
-          }}
-        >
+          }}>
           <div className="list" style={{ padding: '4px 12px' }}>
             {results.map((place) => (
               <button
@@ -106,7 +105,7 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
                   setText(place.name)
                 }}
               >
-                <MapPin size={14} className="muted" aria-hidden="true" />
+                <Muted as={MapPin} size={14} aria-hidden="true" />
                 <span className="grow">
                   <span className="name">{place.name}</span>
                   <span className="meta" style={{ display: 'block' }}>
@@ -116,7 +115,7 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
               </button>
             ))}
           </div>
-        </div>
+        </Panel>
       )}
     </div>
   )

@@ -8,6 +8,7 @@
  */
 
 import type { Split } from '@/lib/analysis'
+import { Muted } from './ui.styled'
 import {
   formatDecimal,
   formatDuration,
@@ -58,15 +59,15 @@ export function SplitsTable({
               <td>
                 {split.index}
                 {partial && (
-                  <span className="muted">
+                  <Muted>
                     {' '}
                     · {formatDecimal(split.meters / (splits[0]?.meters ?? 1), 2)}
-                  </span>
+                  </Muted>
                 )}
               </td>
               <td className="num">
                 {formatPace(split.pace)}
-                <span className="muted">{labels.pace}</span>
+                <Muted>{labels.pace}</Muted>
               </td>
               <td className="bar-cell">
                 <div
@@ -75,24 +76,24 @@ export function SplitsTable({
                 />
               </td>
               {showGap && (
-                <td className="muted">
+                <Muted as="td">
                   {Number.isFinite(split.gradeAdjustedPace)
                     ? formatPace(split.gradeAdjustedPace)
                     : '—'}
-                </td>
+                </Muted>
               )}
-              <td className="muted">
+              <Muted as="td">
                 {split.gain - split.loss >= 0 ? '+' : '−'}
                 {formatElevation(Math.abs(split.gain - split.loss), units)}
-              </td>
-              {showHr && <td className="muted">{split.avgHr ?? '—'}</td>}
+              </Muted>
+              {showHr && <Muted as="td">{split.avgHr ?? '—'}</Muted>}
             </tr>
           )
         })}
       </tbody>
       <tfoot>
         <tr>
-          <td className="muted">Total</td>
+          <Muted as="td">Total</Muted>
           <td className="num">{formatDuration(splits.reduce((sum, s) => sum + s.seconds, 0))}</td>
           <td colSpan={2 + (showGap ? 1 : 0) + (showHr ? 1 : 0)} />
         </tr>

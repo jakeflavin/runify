@@ -8,6 +8,7 @@
  */
 
 import { HR_ZONES } from '@/lib/pace'
+import { Muted } from './ui.styled'
 import { formatDuration } from '@/lib/units'
 
 export function HrZones({ seconds, maxHr }: { seconds: number[]; maxHr: number }) {
@@ -19,9 +20,9 @@ export function HrZones({ seconds, maxHr }: { seconds: number[]; maxHr: number }
     <div>
       {HR_ZONES.map((zone, i) => (
         <div className="zone-row" key={zone.zone}>
-          <div className="muted" title={zone.name}>
+          <Muted as="div"  title={zone.name}>
             Z{zone.zone}
-          </div>
+          </Muted>
           <div className="zone-track">
             <div
               className="zone-fill"
@@ -33,14 +34,14 @@ export function HrZones({ seconds, maxHr }: { seconds: number[]; maxHr: number }
           </div>
           <div style={{ textAlign: 'right' }}>
             {formatDuration(seconds[i] ?? 0)}
-            <span className="muted"> {Math.round(((seconds[i] ?? 0) / total) * 100)}%</span>
+            <Muted> {Math.round(((seconds[i] ?? 0) / total) * 100)}%</Muted>
           </div>
         </div>
       ))}
-      <div className="muted" style={{ fontSize: 11, marginTop: 6 }}>
+      <Muted as="div"  style={{ fontSize: 11, marginTop: 6 }}>
         Zones from a maximum of {maxHr} bpm — Z1 under {Math.round(maxHr * 0.6)}, Z5 over{' '}
         {Math.round(maxHr * 0.9)}.
-      </div>
+      </Muted>
     </div>
   )
 }

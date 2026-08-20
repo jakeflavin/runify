@@ -7,6 +7,19 @@
  */
 
 import type { ReactNode } from 'react'
+import {
+  Band,
+  Head,
+  SegmentedGroup,
+  Spacer,
+  StatBox,
+  StatLabel,
+  StatSub,
+  StatValue,
+  SwitchLabel,
+  Title,
+  Unit,
+} from './ui.styled'
 
 export function Stat({
   label,
@@ -24,14 +37,14 @@ export function Stat({
   tone?: string
 }) {
   return (
-    <div className={`stat${size ? ` ${size}` : ''}`}>
-      <div className="stat-label">{label}</div>
-      <div className="stat-value" style={tone ? { color: tone } : undefined}>
+    <StatBox $size={size}>
+      <StatLabel>{label}</StatLabel>
+      <StatValue style={tone ? { color: tone } : undefined}>
         {value}
-        {unit ? <span className="unit">{unit}</span> : null}
-      </div>
-      {sub ? <div className="stat-sub">{sub}</div> : null}
-    </div>
+        {unit ? <Unit>{unit}</Unit> : null}
+      </StatValue>
+      {sub ? <StatSub>{sub}</StatSub> : null}
+    </StatBox>
   )
 }
 
@@ -45,16 +58,16 @@ export function Section({
   children: ReactNode
 }) {
   return (
-    <section className="section">
+    <Band>
       {(title || action) && (
-        <div className="section-head">
-          {title ? <h2 className="section-title">{title}</h2> : null}
-          <div className="spacer" />
+        <Head>
+          {title ? <Title>{title}</Title> : null}
+          <Spacer />
           {action}
-        </div>
+        </Head>
       )}
       {children}
-    </section>
+    </Band>
   )
 }
 
@@ -72,7 +85,7 @@ export function Segmented<T extends string>({
   label: string
 }) {
   return (
-    <div className={`segmented${brand ? ' brand' : ''}`} role="group" aria-label={label}>
+    <SegmentedGroup $brand={brand} role="group" aria-label={label}>
       {options.map((option) => (
         <button
           key={option.value}
@@ -84,7 +97,7 @@ export function Segmented<T extends string>({
           {option.label}
         </button>
       ))}
-    </div>
+    </SegmentedGroup>
   )
 }
 
@@ -98,9 +111,9 @@ export function Switch({
   children: ReactNode
 }) {
   return (
-    <label className="switch">
+    <SwitchLabel>
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       {children}
-    </label>
+    </SwitchLabel>
   )
 }
