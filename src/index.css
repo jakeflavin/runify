@@ -33,7 +33,10 @@
   --line-strong: #c2c2cc;
   --text: #1c1c1e;
   --text-mid: #4a4a55;
-  --dim: #767680;
+  /* The darkest grey that still reads as dim: 4.5:1 or better on the page, the surface
+     and the sunken pill ground alike. #767680 sat at 4.49:1 on white — a hundredth under
+     the AA floor on the section titles and empty-state copy. */
+  --dim: #67676f;
 
   --brand: #fc5200;
   --brand-hover: #e34800;
@@ -157,3 +160,15 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Mobile Safari zooms the whole viewport when a focused input computes under 16px. The
+ * controls keep their 14px look where a cursor is pointing; only real touch devices get
+ * the bigger glyphs, which the 34px input height already accommodates.
+ */
+@media (pointer: coarse) {
+  input {
+    font-size: 16px;
+  }
+}
+

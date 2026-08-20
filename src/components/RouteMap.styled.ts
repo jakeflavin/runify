@@ -64,4 +64,14 @@ export const MapSurface = styled.div`
   .wp:active {
     cursor: grabbing;
   }
+
+  /* Leaflet's zoom buttons ship at 30px — under the 44px touch minimum. */
+  @media (pointer: coarse) {
+    .leaflet-control-zoom a {
+      width: 44px;
+      height: 44px;
+      line-height: 44px;
+      font-size: 20px;
+    }
+  }
 `

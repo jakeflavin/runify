@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { usePersistentState } from './usePersistentState'
 import { haversine, pathLength, type LatLng } from '@/lib/geo'
 import { routeLeg, type Costing, type RoutedLeg } from '@/api/valhalla'
 
@@ -27,10 +28,18 @@ const key = (from: LatLng, to: LatLng, costing: Costing) =>
   `${costing}:${from.lat.toFixed(6)},${from.lon.toFixed(6)}>${to.lat.toFixed(6)},${to.lon.toFixed(6)}`
 
 let counter = 0
-const makeWaypoint = (point: LatLng): Waypoint => ({ ...point, id: `wp${++counter}` })
+// The timestamp in the id keeps waypoints restored from storage from ever colliding with
+// ones minted this session — the counter alone restarts at zero on every load.
+const makeWaypoint = (point: LatLng): Waypoint => ({
+  ...point,
+  id: `wp${Date.now().toString(36)}-${++counter}`,
+})
 
 export function useRoute(snap: boolean, costing: Costing) {
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([])
+  // The working route survives a reload. Losing fourteen miles of clicking to an
+  // accidental refresh is not a state anyone chose; only the waypoints are stored, and
+  // the legs re-snap from cache-cold exactly as a saved route does.
+  const [waypoints, setWaypoints] = usePersistentState<Waypoint[]>('runify:draft', [])
   const [history, setHistory] = useState<Waypoint[][]>([])
   const [cache, setCache] = useState<Map<string, RoutedLeg>>(() => new Map())
   const [routing, setRouting] = useState(false)
@@ -41,14 +50,17 @@ export function useRoute(snap: boolean, costing: Costing) {
   cacheRef.current = cache
 
   /** Replace the waypoints, pushing the current set onto the undo stack. */
-  const commit = useCallback((next: (current: Waypoint[]) => Waypoint[]) => {
-    setWaypoints((current) => {
-      const updated = next(current)
-      if (updated === current) return current
-      setHistory((past) => [...past, current].slice(-HISTORY_LIMIT))
-      return updated
-    })
-  }, [])
+  const commit = useCallback(
+    (next: (current: Waypoint[]) => Waypoint[]) => {
+      setWaypoints((current) => {
+        const updated = next(current)
+        if (updated === current) return current
+        setHistory((past) => [...past, current].slice(-HISTORY_LIMIT))
+        return updated
+      })
+    },
+    [setWaypoints],
+  )
 
   // Fetch whatever legs are missing. Snapping off short-circuits the whole thing.
   useEffect(() => {
@@ -182,7 +194,7 @@ export function useRoute(snap: boolean, costing: Costing) {
         if (previous) setWaypoints(previous)
         return past.slice(0, -1)
       })
-    }, []),
+    }, [setWaypoints]),
 
     canUndo: history.length > 0,
 

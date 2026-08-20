@@ -93,6 +93,21 @@ rail is the reading.
   *what is it*, then *how fast*, then *the splits that explain the average*, then *the
   terrain and heart rate that explain the splits*.
 
+### The rail's sections are fixtures
+
+Every section in the rail exists on every visit, in the same order, whether it has data or
+not. Nothing appears or disappears as a route is drawn or a file is opened — a section
+without data shows an empty state saying why.
+
+This costs some vertical space and is worth it twice over. It makes the rail a place rather
+than a feed: the finish time is always in the same spot, so the eye learns where to go
+instead of re-reading the stack every time it reflows. And it turns *absent* into *stated* —
+"no heart rate in this file" is information, where a section that simply is not there is
+indistinguishable from a section the app forgot to render.
+
+The same applies inside a stat row: a channel with no data shows a dash and keeps its
+column, rather than collapsing and moving its neighbours.
+
 ## Rules that are easy to get wrong
 
 - **Pace axes run fast-side-up.** Plotting seconds-per-mile the natural way round means "the
@@ -101,8 +116,13 @@ rail is the reading.
   straight line at the top of the frame.
 - **Split bars are scaled from the fastest split, not from zero.** Every split in a run is
   within a minute or so of the others, and a zero-based bar makes them all look identical.
-- **A missing channel is absent, not blank.** A run recorded without a heart-rate strap gets
-  no zone chart, not an empty one.
+- **A missing channel says so.** A run recorded without a heart-rate strap keeps its zone
+  section and explains the absence, rather than dropping the section. (This reverses an
+  earlier rule — "absent, not blank" — which optimised for tidiness and produced a rail
+  that rearranged itself under the reader. See *The rail's sections are fixtures* above.)
+- **Dim means "not comparable", and nothing else.** The part-split at the end of a run gets
+  a dim bar because it is not a like-for-like measurement. The slowest full split does not:
+  it is already the shortest bar, and one treatment carrying two meanings reads as neither.
 - **A stop is a gap.** The pace line breaks where the runner stopped rather than drawing a
   spike down and back through a red light.
 - **Say when a number is uncertain.** A leg the router could not snap is drawn straight and

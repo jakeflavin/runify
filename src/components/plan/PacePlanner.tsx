@@ -76,7 +76,14 @@ export function PacePlanner({
     [distances, elevations, per, flatPace],
   )
 
-  if (meters <= 0) return null
+  // The panel is a fixture of the rail — with nothing drawn it shows its empty state
+  // rather than vanishing and reflowing everything below it when the first pin lands.
+  const empty = meters <= 0
+
+  // Something was typed and it did not parse. Worth a sentence: the dash the stats show
+  // is the right degradation, but on its own it never says why.
+  const typedText = mode === 'pace' ? paceText : timeText
+  const parseFailed = typedText.trim() !== '' && parseDuration(typedText) == null
 
   return (
     <>
@@ -103,7 +110,11 @@ export function PacePlanner({
               inputMode="numeric"
               placeholder="9:00"
               value={
-                mode === 'pace' ? paceText : Number.isFinite(flatPace) ? formatPace(flatPace) : ''
+                mode === 'pace'
+                  ? paceText
+                  : !empty && Number.isFinite(flatPace)
+                    ? formatPace(flatPace)
+                    : ''
               }
               readOnly={mode === 'time'}
               onChange={(event) => setPaceText(event.target.value)}/>
@@ -115,8 +126,14 @@ export function PacePlanner({
               
               inputMode="numeric"
               placeholder="45:00"
+              // With nothing drawn the derived field stays blank rather than reporting the
+              // 0:00 that a zero-length route arithmetically produces.
               value={
-                mode === 'time' ? timeText : Number.isFinite(finish) ? formatDuration(finish) : ''
+                mode === 'time'
+                  ? timeText
+                  : !empty && Number.isFinite(finish)
+                    ? formatDuration(finish)
+                    : ''
               }
               readOnly={mode === 'pace'}
               onChange={(event) => setTimeText(event.target.value)}/>
@@ -124,31 +141,66 @@ export function PacePlanner({
         </Grid2>
 
         <StatRow>
-          <Stat label="Finish" value={formatDuration(finish)} size="lg" tone="var(--brand)" />
+          {/* The accent marks a real answer. A placeholder dash in brand orange claims an
+              emphasis it has not earned, so the empty state keeps the ordinary ink. */}
+          <Stat
+            label="Finish"
+            value={empty ? '—' : formatDuration(finish)}
+            size="lg"
+            tone={empty ? undefined : 'var(--brand)'}
+          />
           <Stat
             label="Average pace"
-            value={formatPace(actualPace)}
-            unit={labels.pace}
-            sub={terrainDescription(terrainFactor, flatPace)}
+            value={empty ? '—' : formatPace(actualPace)}
+            unit={empty ? undefined : labels.pace}
+            sub={empty ? undefined : terrainDescription(terrainFactor, flatPace)}
           />
         </StatRow>
 
-        {!profile && (
-          <Muted as="p"  style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
-            No terrain data for this route yet — these figures assume it is flat.
+        {parseFailed && (
+          <Muted as="p"  role="alert" style={{ fontSize: 12, marginTop: 10, marginBottom: 0, color: 'var(--danger)' }}>
+            {mode === 'pace'
+              ? 'That pace did not read as minutes:seconds — try 9:00.'
+              : 'That time did not read as minutes:seconds — try 45:00.'}
           </Muted>
+        )}
+
+        {empty ? (
+          <Muted as="p"  style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
+            Draw a route and the effort maths starts here.
+          </Muted>
+        ) : (
+          !profile && (
+            <Muted as="p"  style={{ fontSize: 12, marginTop: 10, marginBottom: 0 }}>
+              No terrain data for this route yet — these figures assume it is flat.
+            </Muted>
+          )
         )}
       </Section>
 
-      {splits.length > 0 && (
-        <Section title={`Predicted splits · ${splits.length} ${labels.distance}`}>
-          <SplitsTable splits={splits} units={units} showGap />
-          <Muted as="p"  style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-            Each split is the pace the terrain will produce while you hold the same effort. GAP
-            stays fixed — that is the effort you asked for.
-          </Muted>
-        </Section>
-      )}
+      <Section
+        title={
+          splits.length > 0
+            ? `Predicted splits · ${splits.length} ${labels.distance}`
+            : 'Predicted splits'
+        }
+      >
+        {splits.length > 0 ? (
+          <>
+            <SplitsTable splits={splits} units={units} showGap />
+            <Muted as="p"  style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+              Each split is the pace the terrain will produce while you hold the same effort.
+              GAP stays fixed — that is the effort you asked for.
+            </Muted>
+          </>
+        ) : (
+          <Empty as="p"  style={{ padding: '8px 0' }}>
+            {empty
+              ? `Splits appear once the route is a ${units === 'imperial' ? 'mile' : 'kilometre'} long.`
+              : 'Set a pace or a finish time to predict the splits.'}
+          </Empty>
+        )}
+      </Section>
 
       <Section title="If you raced this distance">
         <RaceEquivalents meters={meters} seconds={finish} units={units} />

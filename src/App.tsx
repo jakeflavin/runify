@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Button, Hint, MapOverlay } from './components/ui.styled'
+import { Button, Hint, MapOverlay, OnHover, OnTouch } from './components/ui.styled'
 import { Masthead, MastheadSpacer, Rail, Shell, Stage, Workspace, Wordmark } from './App.styled'
-import { Activity as ActivityIcon, Moon, PenLine, Sun } from 'lucide-react'
+import { Activity as ActivityIcon, Moon, PenLine, Sun, SunMoon } from 'lucide-react'
 import { RouteMap, type MapFocus } from './components/RouteMap'
 import { Section, Segmented } from './components/ui'
 import { PlanPanel } from './components/plan/PlanPanel'
@@ -106,7 +106,16 @@ export default function App() {
               current === 'dark' ? 'light' : current === 'light' ? 'system' : 'dark',
             )
           }>
-          {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+          {/* One glyph per state. "System" used to borrow the sun, which on a dark OS
+              meant a dark page wearing a light-mode icon — the tap that followed set
+              dark and appeared to do nothing. */}
+          {theme === 'dark' ? (
+            <Moon size={16} />
+          ) : theme === 'light' ? (
+            <Sun size={16} />
+          ) : (
+            <SunMoon size={16} />
+          )}
         </Button>
       </Masthead>
 
@@ -141,7 +150,8 @@ export default function App() {
           {!planning && activity && (
             <MapOverlay>
               <Hint>
-                Colour is pace — brighter is faster. Hover a chart to follow the run.
+                Colour is pace — brighter is faster. <OnHover>Hover</OnHover>
+                <OnTouch>Touch</OnTouch> a chart to follow the run.
               </Hint>
             </MapOverlay>
           )}

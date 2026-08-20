@@ -33,7 +33,6 @@ export function SplitsTable({
 
   const labels = unitLabels(units)
   const paces = splits.map((s) => s.pace).filter(Number.isFinite)
-  const slowest = Math.max(...paces)
   const fastest = Math.min(...paces)
 
   return (
@@ -70,10 +69,14 @@ export function SplitsTable({
                 <Muted>{labels.pace}</Muted>
               </Num>
               <BarCell>
+                {/* Dim means exactly one thing: this bar is not comparable to the others.
+                    The slowest full split used to share the treatment, which put two
+                    unrelated facts in one grey — being slowest is already told by the
+                    shortest bar. */}
                 <Bar
                   data-bar
-                  data-dim={partial || split.pace === slowest || undefined}
-                  $dim={partial || split.pace === slowest}
+                  data-dim={partial || undefined}
+                  $dim={partial}
                   style={{ width: `${Math.max(3, width)}%` }}
                 />
               </BarCell>

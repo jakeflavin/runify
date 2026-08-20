@@ -141,77 +141,84 @@ export function PlanPanel({
         )}
       </Section>
 
-      {!empty && (
-        <Section title="The route">
-          <StatRow>
-            <Stat
-              label="Distance"
-              value={formatDistance(route.meters, units)}
-              unit={labels.distance}
-              size="lg"
-            />
-            <Stat
-              label="Climb"
-              value={profile ? formatElevation(profile.gain, units) : profileLoading ? '…' : '—'}
-              unit={profile ? labels.elevation : undefined}
-              sub={profile ? `−${formatElevation(profile.loss, units)} down` : undefined}
-            />
-            <Stat label="Waypoints" value={route.waypoints.length} />
-          </StatRow>
+      {/* Every section below is a fixture. The rail keeps one shape whether anything has
+          been drawn yet or not — a section without data shows its empty state rather than
+          vanishing, so nothing jumps as the route comes to life. */}
+      <Section title="The route">
+        <StatRow>
+          <Stat
+            label="Distance"
+            value={empty ? '—' : formatDistance(route.meters, units)}
+            unit={empty ? undefined : labels.distance}
+            size="lg"
+          />
+          <Stat
+            label="Climb"
+            value={
+              empty ? '—' : profile ? formatElevation(profile.gain, units) : profileLoading ? '…' : '—'
+            }
+            unit={profile && !empty ? labels.elevation : undefined}
+            sub={profile && !empty ? `−${formatElevation(profile.loss, units)} down` : undefined}
+          />
+          <Stat label="Waypoints" value={route.waypoints.length} />
+        </StatRow>
 
-          {/* A route with no length has no profile to draw — every sample sits at the same
-              place, and the chart would render a flat line across a zero-wide axis. */}
-          {profile && route.meters > 0 && profile.distances.length > 1 && (
-            <div style={{ marginTop: 14 }}>
-              <Suspense fallback={<div style={{ height: 132 }} />}>
-                <ElevationChart
-                  points={profile.distances.flatMap((distance, i) => {
-                    const elevation = profile.series[i]
-                    return elevation === undefined ? [] : [{ distance, elevation }]
-                  })}
-                  path={route.path}
-                  units={units}
-                  onHover={onHoverPoint}
-                />
-              </Suspense>
-            </div>
-          )}
-        </Section>
-      )}
+        {/* A route with no length has no profile to draw — every sample sits at the same
+            place, and the chart would render a flat line across a zero-wide axis. */}
+        {profile && route.meters > 0 && profile.distances.length > 1 && (
+          <div style={{ marginTop: 14 }}>
+            <Suspense fallback={<div style={{ height: 132 }} />}>
+              <ElevationChart
+                points={profile.distances.flatMap((distance, i) => {
+                  const elevation = profile.series[i]
+                  return elevation === undefined ? [] : [{ distance, elevation }]
+                })}
+                path={route.path}
+                units={units}
+                onHover={onHoverPoint}
+              />
+            </Suspense>
+          </div>
+        )}
+      </Section>
 
-      {!empty && <PacePlanner meters={route.meters} profile={profile} units={units} />}
+      <PacePlanner meters={route.meters} profile={profile} units={units} />
 
-      {!empty && (
-        <Section title="Keep it">
-          <Row>
-            <Input
-              
-              style={{ flex: 1, minWidth: 140 }}
-              placeholder="Name this route"
-              value={name}
-              aria-label="Route name"
-              onChange={(event) => setName(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  onSave(name)
-                  setName('')
-                }
-              }}/>
-            <Button $primary
-              type="button"
-              
-              onClick={() => {
+      <Section title="Keep it">
+        <Row>
+          <Input
+
+            style={{ flex: 1, minWidth: 140 }}
+            placeholder="Name this route"
+            value={name}
+            aria-label="Route name"
+            disabled={empty}
+            onChange={(event) => setName(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !empty) {
                 onSave(name)
                 setName('')
-              }}>
-              <Save size={14} /> Save
-            </Button>
-            <Button type="button"  onClick={onExport} title="Download as GPX">
-              <Download size={14} /> GPX
-            </Button>
-          </Row>
-        </Section>
-      )}
+              }
+            }}/>
+          <Button $primary
+            type="button"
+            disabled={empty}
+            onClick={() => {
+              onSave(name)
+              setName('')
+            }}>
+            <Save size={14} /> Save
+          </Button>
+          <Button type="button" disabled={empty} onClick={onExport} title="Download as GPX">
+            <Download size={14} /> GPX
+          </Button>
+        </Row>
+        {empty && (
+          <Empty as="p"  style={{ padding: '8px 0 0', textAlign: 'left' }}>
+            Draw a route to save it or take it as GPX.
+          </Empty>
+        )}
+      </Section>
 
       <SavedRoutes
         routes={savedRoutes}

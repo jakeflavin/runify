@@ -61,8 +61,9 @@ export const StatValue = styled.div`
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin-top: 2px;
-  /* Stats sit in equal grid columns. A value wider than its share has to be clipped to its
-     own column rather than spilling across the hairline into the next one. */
+  /* Kept as a last-ditch backstop only: the row's columns are sized so a value always
+     gets at least its own width (see StatRow). The number is what the stat exists to
+     show — an ellipsized "11.3…" is the one rendering this component must not produce. */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -89,7 +90,11 @@ export const StatBox = styled.div<{ $size?: 'sm' | 'lg' }>`
 export const StatRow = styled.div`
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  /* Every column gets at least its content's width, and only the leftover space is shared
+     equally. Plain 1fr divided the row into equal thirds regardless of content, which is
+     how a double-digit distance ended up clipped to "11.3…" beside a two-digit waypoint
+     count that used a fraction of its share. */
+  grid-auto-columns: minmax(max-content, 1fr);
 
   > ${StatBox} + ${StatBox} {
     border-left: 1px solid var(--line);
@@ -174,6 +179,23 @@ export const Button = styled.button<{
       background: transparent;
     }
   `}
+
+  /* On touch devices the pill keeps its size but the finger gets a 44px hit area. The
+     vertical reach is generous; the horizontal stays inside the 8px row gap so adjacent
+     buttons never trade taps. */
+  @media (pointer: coarse) {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -4px;
+      right: -4px;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
 `
 
 /** Segmented control — the Strava tab pill. */
@@ -228,6 +250,41 @@ export const SegmentedGroup = styled.div<{ $brand?: boolean }>`
    * won on source order at equal specificity. Reproducing it here would apply it for the
    * first time, which is a change, not a migration — so it is dropped.
    */
+
+  /* Touch reach without touching the layout: the buttons stay 28px pills, the fingers
+     get 44px. Vertical only — the segments touch each other horizontally. */
+  @media (pointer: coarse) {
+    button {
+      position: relative;
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+
+  /*
+   * The masthead's full-width content measures about 362px, so anything narrower than
+   * ~375px cannot hold it — at 320px it used to overflow the viewport by 42px and push
+   * the theme control clean off the screen. Only those genuinely tight screens give up
+   * the labels; a 390px phone keeps them, because it has the room. Options that carry an
+   * icon shed their text first; text-only options (the units) always keep theirs.
+   */
+  @media (max-width: 374px) {
+    button[data-icon='true'] .seg-label {
+      display: none;
+    }
+
+    button {
+      padding: 0 10px;
+    }
+  }
 `
 
 export const SwitchLabel = styled.label`
@@ -270,6 +327,12 @@ export const SwitchLabel = styled.label`
 
   input:checked::after {
     transform: translateX(14px);
+  }
+
+  /* The 34×20 track is under the touch minimum; the whole label is the target anyway,
+     so on touch devices it stretches to a 44px row without moving the layout much. */
+  @media (pointer: coarse) {
+    min-height: 44px;
   }
 `
 
@@ -408,11 +471,31 @@ export const Grow = styled.div`
   min-width: 0;
 `
 
+/*
+ * Copy that names an interaction the device does not have is worse than no copy at all —
+ * "hover a chart" on a phone describes something the reader cannot do. These two let one
+ * sentence carry the right verb for whichever input is actually present.
+ */
+export const OnHover = styled.span`
+  @media (hover: none) {
+    display: none;
+  }
+`
+
+export const OnTouch = styled.span`
+  @media (hover: hover) {
+    display: none;
+  }
+`
+
 export const ItemName = styled.div`
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* Rendered through \`as="span"\` inside list rows, where an inline box ignores the
+     ellipsis above and a long saved-route name runs underneath its own delete button. */
+  display: block;
 `
 
 export const ItemMeta = styled.div`
@@ -498,6 +581,11 @@ export const Input = styled.input`
   &:focus {
     border-color: var(--brand);
     outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
   }
 `
 

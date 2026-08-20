@@ -8,7 +8,7 @@
  */
 
 import { Suspense, lazy, useMemo } from 'react'
-import { Button, Chip, Input, Muted, Row, StatRow } from '../ui.styled'
+import { Button, Chip, Empty, Input, Muted, Row, StatRow } from '../ui.styled'
 import { Heart, Repeat2, TrendingUp } from 'lucide-react'
 import { Section, Stat } from '@/components/ui'
 import { SplitsTable } from '@/components/SplitsTable'
@@ -97,6 +97,9 @@ export function AnalyzePanel({
           />
         </StatRow>
 
+        {/* Both rows always render every stat. A channel the file did not record shows a
+            dash rather than removing its column, so two runs from the same watch put the
+            same number in the same place and the eye can go straight to it. */}
         <StatRow>
           <Stat
             label="Pace"
@@ -104,91 +107,106 @@ export function AnalyzePanel({
             unit={labels.pace}
             tone="var(--brand)"
           />
-          {analysis.hasElevation && (
-            <Stat
-              label="GAP"
-              value={formatPace(analysis.gradeAdjustedPace)}
-              unit={labels.pace}
-              sub="grade adjusted"
-            />
-          )}
-          {analysis.hasElevation && (
-            <Stat
-              label="Climb"
-              value={formatElevation(analysis.elevation.gain, units)}
-              unit={labels.elevation}
-            />
-          )}
+          <Stat
+            label="GAP"
+            value={analysis.hasElevation ? formatPace(analysis.gradeAdjustedPace) : '—'}
+            unit={analysis.hasElevation ? labels.pace : undefined}
+            sub="grade adjusted"
+          />
+          <Stat
+            label="Climb"
+            value={analysis.hasElevation ? formatElevation(analysis.elevation.gain, units) : '—'}
+            unit={analysis.hasElevation ? labels.elevation : undefined}
+          />
         </StatRow>
 
-        {(analysis.hasHr || analysis.hasCadence || Number.isFinite(fitness)) && (
-          <StatRow  style={{ marginTop: 14 }}>
-            {analysis.hasHr && (
-              <Stat
-                label="Avg HR"
-                value={analysis.avgHr ?? '—'}
-                unit="bpm"
-                size="sm"
-                sub={`max ${analysis.maxHr}`}
+        <StatRow  style={{ marginTop: 14 }}>
+          <Stat
+            label="Avg HR"
+            value={analysis.hasHr ? (analysis.avgHr ?? '—') : '—'}
+            unit={analysis.hasHr ? 'bpm' : undefined}
+            size="sm"
+            sub={analysis.hasHr ? `max ${analysis.maxHr}` : undefined}
+          />
+          <Stat
+            label="Cadence"
+            value={analysis.hasCadence ? (analysis.avgCadence ?? '—') : '—'}
+            unit={analysis.hasCadence ? 'spm' : undefined}
+            size="sm"
+          />
+          <Stat
+            label="VDOT"
+            value={Number.isFinite(fitness) ? formatDecimal(fitness) : '—'}
+            size="sm"
+            sub="Daniels & Gilbert"
+          />
+        </StatRow>
+      </Section>
+
+      {/* The four sections below are fixtures of the rail. A file that did not record a
+          channel gets a sentence naming what is missing, rather than the section silently
+          not existing — the rail then has one shape for every run, and the reason a chart
+          is absent is on screen instead of inferred. */}
+      <Section title="Pace">
+        {analysis.hasTime && analysis.series.pace.some(Number.isFinite) ? (
+          <>
+            <Suspense fallback={<div style={{ height: 160 }} />}>
+              <PaceChart
+                distances={analysis.series.distance}
+                paces={analysis.series.pace}
+                heartRates={analysis.hasHr ? activity.points.map((p) => p.hr) : undefined}
+                path={activity.points}
+                units={units}
+                onHover={onHoverPoint}
               />
+            </Suspense>
+            {analysis.hasHr && (
+              <Row  style={{ gap: 14, marginTop: 8, fontSize: 12 }}>
+                <Muted>
+                  <span style={{ color: 'var(--s-pace)' }}>●</span> Pace
+                </Muted>
+                <Muted>
+                  <span style={{ color: 'var(--s-hr)' }}>●</span> Heart rate
+                </Muted>
+              </Row>
             )}
-            {analysis.hasCadence && (
-              <Stat label="Cadence" value={analysis.avgCadence ?? '—'} unit="spm" size="sm" />
-            )}
-            {Number.isFinite(fitness) && (
-              <Stat label="VDOT" value={formatDecimal(fitness)} size="sm" sub="Daniels & Gilbert" />
-            )}
-          </StatRow>
+          </>
+        ) : (
+          <Empty as="p"  style={{ padding: '8px 0' }}>
+            This file has no timestamps, so there is no pace to plot.
+          </Empty>
         )}
       </Section>
 
-      {analysis.hasTime && analysis.series.pace.some(Number.isFinite) && (
-        <Section title="Pace">
-          <Suspense fallback={<div style={{ height: 160 }} />}>
-            <PaceChart
-              distances={analysis.series.distance}
-              paces={analysis.series.pace}
-              heartRates={analysis.hasHr ? activity.points.map((p) => p.hr) : undefined}
-              path={activity.points}
-              units={units}
-              onHover={onHoverPoint}
-            />
-          </Suspense>
-          {analysis.hasHr && (
-            <Row  style={{ gap: 14, marginTop: 8, fontSize: 12 }}>
-              <Muted>
-                <span style={{ color: 'var(--s-pace)' }}>●</span> Pace
-              </Muted>
-              <Muted>
-                <span style={{ color: 'var(--s-hr)' }}>●</span> Heart rate
-              </Muted>
-            </Row>
-          )}
-        </Section>
-      )}
-
-      {analysis.splits.length > 0 && (
-        <Section title={`Splits · per ${units === 'imperial' ? 'mile' : 'kilometre'}`}>
+      <Section title={`Splits · per ${units === 'imperial' ? 'mile' : 'kilometre'}`}>
+        {analysis.splits.length > 0 ? (
           <SplitsTable
             splits={analysis.splits}
             units={units}
             showHr={analysis.hasHr}
             showGap={analysis.hasElevation}
           />
-        </Section>
-      )}
+        ) : (
+          <Empty as="p"  style={{ padding: '8px 0' }}>
+            The run is shorter than one {units === 'imperial' ? 'mile' : 'kilometre'} — no
+            splits yet.
+          </Empty>
+        )}
+      </Section>
 
-      {analysis.hasElevation && (
-        <Section
-          title="Elevation"
-          action={
+      <Section
+        title="Elevation"
+        action={
+          analysis.hasElevation ? (
             <Chip>
               <TrendingUp size={11} aria-hidden="true" />+
               {formatElevation(analysis.elevation.gain, units)} / −
               {formatElevation(analysis.elevation.loss, units)} {labels.elevation}
             </Chip>
-          }
-        >
+          ) : undefined
+        }
+      >
+        {analysis.hasElevation ? (
           <Suspense fallback={<div style={{ height: 132 }} />}>
             <ElevationChart
               points={analysis.series.distance.flatMap((distance, i) => {
@@ -202,18 +220,22 @@ export function AnalyzePanel({
               onHover={onHoverPoint}
             />
           </Suspense>
-        </Section>
-      )}
+        ) : (
+          <Empty as="p"  style={{ padding: '8px 0' }}>
+            This file recorded no elevation, so there is no profile to draw.
+          </Empty>
+        )}
+      </Section>
 
-      {zones && (
-        <Section
-          title="Heart rate zones"
-          action={
+      <Section
+        title="Heart rate zones"
+        action={
+          zones ? (
             <Row as="label"  style={{ gap: 6, fontSize: 12 }}>
               <Muted as={Heart} size={12} aria-hidden="true" />
               <Muted>Max</Muted>
               <Input
-                
+
                 style={{ width: 62, height: 26 }}
                 type="number"
                 min={120}
@@ -225,11 +247,17 @@ export function AnalyzePanel({
                   if (value >= 120 && value <= 230) setMaxHr(value)
                 }}/>
             </Row>
-          }
-        >
+          ) : undefined
+        }
+      >
+        {zones ? (
           <HrZones seconds={zones} maxHr={maxHr} />
-        </Section>
-      )}
+        ) : (
+          <Empty as="p"  style={{ padding: '8px 0' }}>
+            No heart rate in this file — recorded without a strap or a watch that reports it.
+          </Empty>
+        )}
+      </Section>
     </>
   )
 }

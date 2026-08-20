@@ -22,6 +22,14 @@ export const Masthead = styled.header`
     gap: 8px;
     padding: 0 10px;
   }
+
+  /* At 320px the full row measured 362px and pushed the theme button off-screen. With
+     the mode labels collapsed to icons (see SegmentedGroup) and the gaps closed up,
+     everything fits with room to spare. Phones with room keep the labels. */
+  @media (max-width: 374px) {
+    gap: 6px;
+    padding: 0 8px;
+  }
 `
 
 /*

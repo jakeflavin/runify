@@ -91,10 +91,14 @@ export function Segmented<T extends string>({
           key={option.value}
           type="button"
           aria-pressed={value === option.value}
+          // Lets the stylesheet drop the text label on very narrow screens for options
+          // whose icon can stand alone — text-only options always keep their label.
+          data-icon={option.icon ? 'true' : undefined}
+          aria-label={option.label}
           onClick={() => onChange(option.value)}
         >
           {option.icon}
-          {option.label}
+          <span className="seg-label">{option.label}</span>
         </button>
       ))}
     </SegmentedGroup>

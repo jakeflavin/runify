@@ -44,6 +44,11 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
 
   const results = data ?? []
 
+  // Silence after a search reads as "still thinking" or "broken", never as "no such
+  // place". Only a settled query gets the message — while typing or fetching, nothing.
+  const nothingFound =
+    open && !isFetching && data !== undefined && results.length === 0 && query.trim().length >= 3
+
   return (
     <div ref={box} style={{ position: 'relative', flex: 1, minWidth: 180, maxWidth: 320 }}>
       <Floating  style={{ borderRadius: 8, padding: '0 8px' }}>
@@ -81,6 +86,21 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
           </Button>
         ) : null}
       </Floating>
+
+      {nothingFound && (
+        <Panel
+
+          style={{
+            position: 'absolute',
+            top: 44,
+            left: 0,
+            right: 0,
+            boxShadow: 'var(--shadow-float)',
+            padding: '10px 14px',
+          }}>
+          <Muted style={{ fontSize: 13 }}>Nothing found for that — try a town or a street.</Muted>
+        </Panel>
+      )}
 
       {open && results.length > 0 && (
         <Panel

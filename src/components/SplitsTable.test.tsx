@@ -40,11 +40,13 @@ describe('SplitsTable', () => {
     expect(second!.style.width).toBe('50%')
   })
 
-  it('dims the slowest split so the worst one reads as the worst', () => {
+  it('keeps every full split in colour — dim is reserved for the incomparable', () => {
+    // The slowest full split used to share the partial's grey, which gave one treatment
+    // two meanings. Being slowest is already told by the shortest bar.
     const { container } = render(
       <SplitsTable splits={[split(), split({ index: 2, pace: 600 })]} units="imperial" />,
     )
-    expect(bars(container)[1]).toHaveAttribute('data-dim')
+    expect(bars(container)[1]).not.toHaveAttribute('data-dim')
     expect(bars(container)[0]).not.toHaveAttribute('data-dim')
   })
 
