@@ -30,9 +30,22 @@ let failures = 0;
 
 for (const sheet of SHEETS) {
   if (!fs.existsSync(sheet)) continue;
-  const css = fs.readFileSync(sheet, "utf8")
+  const raw = fs.readFileSync(sheet, "utf8");
+
+  /*
+   * A rule may be exempted by the comment directly above it. The escape hatch is
+   * deliberately noisy: it names a reason, and it shows up in a diff.
+   */
+  const allowed = new Set(
+    [...raw.matchAll(/\/\*\s*global-css-allow:[^*]*\*\/\s*([^{]+)\{/g)]
+      .map((m) => m[1].trim()),
+  );
+
+  const css = raw
     // Comments can contain anything, including examples that look like selectors.
-    .replace(/\/\*[\s\S]*?\*\//g, "");
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    // A keyframes block's steps are percentages, not selectors.
+    .replace(/@keyframes[^{]*\{(?:[^{}]|\{[^{}]*\})*\}/g, "");
 
   // Whatever sits between the last brace or semicolon and a "{" is a selector.
   let buffer = "";
@@ -40,7 +53,7 @@ for (const sheet of SHEETS) {
     if (ch === "{") {
       const selector = buffer.trim();
       buffer = "";
-      if (!selector || selector.startsWith("@")) continue;
+      if (!selector || selector.startsWith("@") || allowed.has(selector)) continue;
 
       for (const part of selector.split(",")) {
         // Descendant and combinator parts are each judged on their own.
