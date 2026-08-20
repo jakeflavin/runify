@@ -44,6 +44,19 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+      <!--
+      Resolves the theme before the first paint. Every app switches tokens on
+      <html data-theme>, but React only sets it on mount — so without this the page
+      paints the light palette first, which is a white flash on a dark screen.
+    -->
+    <script>
+      try {
+        var stored = localStorage.getItem('runify:theme');
+        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme =
+          stored === 'light' || stored === 'dark' ? stored : dark ? 'dark' : 'light';
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
