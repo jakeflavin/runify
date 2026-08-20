@@ -252,7 +252,8 @@ export const SegmentedGroup = styled.div<{ $brand?: boolean }>`
    */
 
   /* Touch reach without touching the layout: the buttons stay 28px pills, the fingers
-     get 44px. Vertical only — the segments touch each other horizontally. */
+     get 44px. Vertical only — the segments already touch each other horizontally, and
+     an overlapping hit area would mean a tap near the seam operates the wrong one. */
   @media (pointer: coarse) {
     button {
       position: relative;
@@ -266,6 +267,18 @@ export const SegmentedGroup = styled.div<{ $brand?: boolean }>`
       right: 0;
       height: 44px;
       transform: translateY(-50%);
+    }
+  }
+
+  /*
+   * Width, where there is width to give. Below 375px the masthead has about 16px spare
+   * once the labels are down to icons, and widening six segments to 44px each needs 36 —
+   * so the narrowest phones keep 44px-tall targets at their natural width. That is the
+   * honest trade: full height everywhere, full width as soon as the screen allows it.
+   */
+  @media (pointer: coarse) and (min-width: 375px) {
+    button {
+      min-width: 44px;
     }
   }
 
@@ -586,6 +599,12 @@ export const Input = styled.input`
   &:disabled {
     opacity: 0.42;
     cursor: not-allowed;
+  }
+
+  /* min-height rather than height, so it also lifts the few inputs that carry an inline
+     height of their own — the max-heart-rate box in the zones header, for one. */
+  @media (pointer: coarse) {
+    min-height: 44px;
   }
 `
 
