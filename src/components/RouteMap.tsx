@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useRef } from 'react'
+import { MapSurface } from './RouteMap.styled'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { LatLng } from '@/lib/geo'
@@ -302,5 +303,5 @@ export function RouteMap({
     return () => cancelAnimationFrame(frame)
   }, [focus])
 
-  return <div ref={container} className="map" role="application" aria-label="Route map" />
+  return <MapSurface ref={container}  role="application" aria-label="Route map"/>
 }

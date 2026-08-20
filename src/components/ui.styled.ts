@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { spinning } from '@/styles/spin'
 
 export const Panel = styled.div`
   background: var(--surface);
@@ -318,4 +319,247 @@ export const Empty = styled.div`
   text-align: center;
   padding: 24px 12px;
   line-height: 1.5;
+`
+
+/*
+ * Both of these were written as `.table .num` and `.table .bar-cell`, which outranked the
+ * table's own `td` rule. As standalone components they score lower than it, so they double
+ * their class to keep the padding and weight they had.
+ */
+export const Num = styled.td`
+  && {
+    font-weight: 600;
+  }
+`
+
+export const BarCell = styled.td`
+  && {
+    width: 40%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+`
+
+export const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: right;
+    padding: 0 0 6px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+
+  td {
+    padding: 7px 0;
+    text-align: right;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+`
+
+/** The horizontal pace bar Strava draws beside each split. */
+export const Bar = styled.div<{ $dim?: boolean }>`
+  height: 9px;
+  border-radius: 999px;
+  background: var(--brand);
+  min-width: 3px;
+
+  ${(props) => props.$dim && 'background: var(--line-strong);'}
+`
+
+export const Floating = styled.div`
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow-float);
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+`
+
+export const Hint = styled.div`
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-float);
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-mid);
+  max-width: 260px;
+`
+
+export const Grow = styled.div`
+  flex: 1;
+  min-width: 0;
+`
+
+export const ItemName = styled.div`
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
+export const ItemMeta = styled.div`
+  font-size: 12px;
+  color: var(--dim);
+`
+
+export const List = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+export const ListItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hi);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+`
+
+/** Zone meter — one stacked bar per heart-rate zone. */
+export const ZoneRow = styled.div`
+  display: grid;
+  grid-template-columns: 28px 1fr 62px;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 12px;
+`
+
+export const ZoneTrack = styled.div`
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  overflow: hidden;
+`
+
+export const ZoneFill = styled.div`
+  height: 100%;
+  border-radius: 999px;
+`
+
+export const Field = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+
+  > label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+`
+
+export const Input = styled.input`
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+
+  &:focus {
+    border-color: var(--brand);
+    outline: none;
+  }
+`
+
+export const MapOverlay = styled.div<{ $bottom?: boolean }>`
+  position: absolute;
+  z-index: 450;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  ${(props) =>
+    props.$bottom
+      ? `
+    bottom: 24px;
+    left: 12px;
+  `
+      : `
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    flex-wrap: wrap;
+  `}
+`
+
+export const DropZone = styled.div<{ $over?: boolean }>`
+  border: 2px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--dim);
+  cursor: pointer;
+  background: var(--surface-hi);
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+
+  strong {
+    display: block;
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  &:hover {
+    border-color: var(--brand);
+    background: var(--brand-wash);
+    color: var(--brand);
+  }
+
+  ${(props) =>
+    props.$over &&
+    `
+    border-color: var(--brand);
+    background: var(--brand-wash);
+    color: var(--brand);
+
+    strong { color: var(--brand); }
+  `}
+`
+
+/** A turning icon, applied through `as` so it keeps the icon's own element. */
+export const Spinner = styled.span`
+  ${spinning}
 `

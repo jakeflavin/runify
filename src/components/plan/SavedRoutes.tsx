@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react'
-import { Button } from '../ui.styled'
+import { Button, Grow, ItemMeta, ItemName, List, ListItem } from '../ui.styled'
 import { Section } from '@/components/ui'
 import type { SavedRoute } from '@/hooks/useSavedRoutes'
 import { formatDistance, unitLabels, type UnitSystem } from '@/lib/units'
@@ -23,12 +23,12 @@ export function SavedRoutes({
 
   return (
     <Section title={`Saved routes · ${routes.length}`}>
-      <div className="list">
+      <List>
         {routes.map((route) => (
-          <div key={route.id} className="list-item" style={{ cursor: 'default' }}>
-            <button
+          <ListItem as="div" key={route.id}  style={{ cursor: 'default' }}>
+            <Grow as="button"
               type="button"
-              className="grow"
+              
               style={{
                 background: 'none',
                 border: 'none',
@@ -36,13 +36,12 @@ export function SavedRoutes({
                 textAlign: 'left',
                 cursor: 'pointer',
               }}
-              onClick={() => onOpen(route)}
-            >
-              <span className="name">{route.name}</span>
-              <span className="meta" style={{ display: 'block' }}>
+              onClick={() => onOpen(route)}>
+              <ItemName as="span">{route.name}</ItemName>
+              <ItemMeta as="span"  style={{ display: 'block' }}>
                 {formatDistance(route.meters, units)} {labels.distance} · {when(route.savedAt)}
-              </span>
-            </button>
+              </ItemMeta>
+            </Grow>
             <Button $ghost $small $icon $danger
               type="button"
               
@@ -50,9 +49,9 @@ export function SavedRoutes({
               onClick={() => onRemove(route.id)}>
               <Trash2 size={14} />
             </Button>
-          </div>
+          </ListItem>
         ))}
-      </div>
+      </List>
     </Section>
   )
 }

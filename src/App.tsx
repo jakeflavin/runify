@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Button } from './components/ui.styled'
+import { Button, Hint, MapOverlay } from './components/ui.styled'
 import { Masthead, MastheadSpacer, Rail, Shell, Stage, Workspace, Wordmark } from './App.styled'
 import { Activity as ActivityIcon, Moon, PenLine, Sun } from 'lucide-react'
 import { RouteMap, type MapFocus } from './components/RouteMap'
@@ -125,7 +125,7 @@ export default function App() {
           />
 
           {planning && (
-            <div className="map-overlay top-left">
+            <MapOverlay>
               <PlaceSearch
                 onPick={(place) =>
                   setFocus({
@@ -135,15 +135,15 @@ export default function App() {
                   })
                 }
               />
-            </div>
+            </MapOverlay>
           )}
 
           {!planning && activity && (
-            <div className="map-overlay top-left">
-              <div className="hint">
+            <MapOverlay>
+              <Hint>
                 Colour is pace — brighter is faster. Hover a chart to follow the run.
-              </div>
-            </div>
+              </Hint>
+            </MapOverlay>
           )}
         </Stage>
 

@@ -8,7 +8,7 @@
  */
 
 import { Suspense, lazy, useMemo } from 'react'
-import { Button, Chip, Muted, Row, StatRow } from '../ui.styled'
+import { Button, Chip, Input, Muted, Row, StatRow } from '../ui.styled'
 import { Heart, Repeat2, TrendingUp } from 'lucide-react'
 import { Section, Stat } from '@/components/ui'
 import { SplitsTable } from '@/components/SplitsTable'
@@ -212,8 +212,8 @@ export function AnalyzePanel({
             <Row as="label"  style={{ gap: 6, fontSize: 12 }}>
               <Muted as={Heart} size={12} aria-hidden="true" />
               <Muted>Max</Muted>
-              <input
-                className="input"
+              <Input
+                
                 style={{ width: 62, height: 26 }}
                 type="number"
                 min={120}
@@ -223,8 +223,7 @@ export function AnalyzePanel({
                 onChange={(event) => {
                   const value = Number(event.target.value)
                   if (value >= 120 && value <= 230) setMaxHr(value)
-                }}
-              />
+                }}/>
             </Row>
           }
         >

@@ -18,6 +18,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { Chart, Key, Tooltip as TipBox, Value } from './charts.styled'
 import { pointAt, type LatLng } from '@/lib/geo'
 import {
   formatDistance,
@@ -83,12 +84,11 @@ export function PaceChart({
   const hasHr = data.some((row) => row.hr !== null)
 
   return (
-    <div
-      className="chart"
+    <Chart
+      
       onMouseLeave={() => onHover?.(null)}
       style={{ height }}
-      aria-label="Pace"
-    >
+      aria-label="Pace">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -138,26 +138,26 @@ export function PaceChart({
               const point = payload[0]?.payload as (typeof data)[number] | undefined
               if (!point) return null
               return (
-                <div className="tooltip">
+                <TipBox>
                   <div>
-                    <span className="k">At</span>
-                    <span className="v">
+                    <Key>At</Key>
+                    <Value>
                       {formatDistance(point.meters, units)} {labels.distance}
-                    </span>
+                    </Value>
                   </div>
                   <div>
-                    <span className="k">Pace</span>
-                    <span className="v">
+                    <Key>Pace</Key>
+                    <Value>
                       {point.pace === null ? 'stopped' : `${formatPace(point.pace)}${labels.pace}`}
-                    </span>
+                    </Value>
                   </div>
                   {point.hr !== null && (
                     <div>
-                      <span className="k">Heart rate</span>
-                      <span className="v">{Math.round(point.hr)} bpm</span>
+                      <Key>Heart rate</Key>
+                      <Value>{Math.round(point.hr)} bpm</Value>
                     </div>
                   )}
-                </div>
+                </TipBox>
               )
             }}
           />
@@ -183,6 +183,6 @@ export function PaceChart({
           )}
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </Chart>
   )
 }

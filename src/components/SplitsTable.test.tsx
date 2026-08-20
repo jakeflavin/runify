@@ -15,7 +15,7 @@ const split = (over: Partial<Split> = {}): Split => ({
   ...over,
 })
 
-const bars = (c: HTMLElement) => [...c.querySelectorAll('.bar')] as HTMLElement[]
+const bars = (c: HTMLElement) => [...c.querySelectorAll('[data-bar]')] as HTMLElement[]
 
 describe('SplitsTable', () => {
   it('renders nothing at all when there are no splits', () => {
@@ -44,8 +44,8 @@ describe('SplitsTable', () => {
     const { container } = render(
       <SplitsTable splits={[split(), split({ index: 2, pace: 600 })]} units="imperial" />,
     )
-    expect(bars(container)[1]).toHaveClass('dim')
-    expect(bars(container)[0]).not.toHaveClass('dim')
+    expect(bars(container)[1]).toHaveAttribute('data-dim')
+    expect(bars(container)[0]).not.toHaveAttribute('data-dim')
   })
 
   it('marks a part-split at the end, since it is not comparable to a full one', () => {
@@ -53,7 +53,7 @@ describe('SplitsTable', () => {
       <SplitsTable splits={[split(), split({ index: 2, meters: 800 })]} units="imperial" />,
     )
     expect(screen.getByText(/· 0\.50/)).toBeInTheDocument()
-    expect(bars(container)[1]).toHaveClass('dim')
+    expect(bars(container)[1]).toHaveAttribute('data-dim')
   })
 
   it('keeps a bar visible even when the split is far off the pace', () => {

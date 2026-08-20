@@ -8,7 +8,7 @@
  */
 
 import type { Split } from '@/lib/analysis'
-import { Muted } from './ui.styled'
+import { Bar, BarCell, Muted, Num, Table } from './ui.styled'
 import {
   formatDecimal,
   formatDuration,
@@ -37,12 +37,12 @@ export function SplitsTable({
   const fastest = Math.min(...paces)
 
   return (
-    <table className="table">
+    <Table>
       <thead>
         <tr>
           <th>{units === 'imperial' ? 'Mile' : 'Km'}</th>
           <th>Pace</th>
-          <th className="bar-cell" aria-hidden="true" />
+          <BarCell as="th"  aria-hidden="true"/>
           {showGap && <th>GAP</th>}
           <th>Elev</th>
           {showHr && <th>HR</th>}
@@ -65,16 +65,18 @@ export function SplitsTable({
                   </Muted>
                 )}
               </td>
-              <td className="num">
+              <Num>
                 {formatPace(split.pace)}
                 <Muted>{labels.pace}</Muted>
-              </td>
-              <td className="bar-cell">
-                <div
-                  className={`bar${partial || split.pace === slowest ? ' dim' : ''}`}
+              </Num>
+              <BarCell>
+                <Bar
+                  data-bar
+                  data-dim={partial || split.pace === slowest || undefined}
+                  $dim={partial || split.pace === slowest}
                   style={{ width: `${Math.max(3, width)}%` }}
                 />
-              </td>
+              </BarCell>
               {showGap && (
                 <Muted as="td">
                   {Number.isFinite(split.gradeAdjustedPace)
@@ -94,10 +96,10 @@ export function SplitsTable({
       <tfoot>
         <tr>
           <Muted as="td">Total</Muted>
-          <td className="num">{formatDuration(splits.reduce((sum, s) => sum + s.seconds, 0))}</td>
+          <Num>{formatDuration(splits.reduce((sum, s) => sum + s.seconds, 0))}</Num>
           <td colSpan={2 + (showGap ? 1 : 0) + (showHr ? 1 : 0)} />
         </tr>
       </tfoot>
-    </table>
+    </Table>
   )
 }

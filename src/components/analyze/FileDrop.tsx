@@ -7,6 +7,7 @@
  */
 
 import { useRef, useState } from 'react'
+import { DropZone } from '../ui.styled'
 import { Upload } from 'lucide-react'
 
 export function FileDrop({
@@ -21,8 +22,8 @@ export function FileDrop({
 
   return (
     <>
-      <div
-        className={`dropzone${over ? ' over' : ''}`}
+      <DropZone
+        $over={over}
         role="button"
         tabIndex={0}
         onClick={() => input.current?.click()}
@@ -49,7 +50,7 @@ export function FileDrop({
         Export one from Strava, Garmin Connect, COROS or Apple Fitness.
         <br />
         It is read here in the browser and never uploaded anywhere.
-      </div>
+      </DropZone>
 
       <input
         ref={input}

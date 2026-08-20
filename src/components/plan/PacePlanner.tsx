@@ -8,7 +8,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { Empty, Grid2, Muted, StatRow } from '../ui.styled'
+import { Empty, Field, Grid2, Input, Muted, Num, StatRow, Table } from '../ui.styled'
 import { Flag, Timer } from 'lucide-react'
 import { Section, Segmented, Stat } from '@/components/ui'
 import { SplitsTable } from '@/components/SplitsTable'
@@ -95,34 +95,32 @@ export function PacePlanner({
         }
       >
         <Grid2  style={{ marginBottom: 14 }}>
-          <div className="field">
+          <Field>
             <label htmlFor="plan-pace">Flat pace {labels.pace}</label>
-            <input
+            <Input
               id="plan-pace"
-              className="input"
+              
               inputMode="numeric"
               placeholder="9:00"
               value={
                 mode === 'pace' ? paceText : Number.isFinite(flatPace) ? formatPace(flatPace) : ''
               }
               readOnly={mode === 'time'}
-              onChange={(event) => setPaceText(event.target.value)}
-            />
-          </div>
-          <div className="field">
+              onChange={(event) => setPaceText(event.target.value)}/>
+          </Field>
+          <Field>
             <label htmlFor="plan-time">Target finish</label>
-            <input
+            <Input
               id="plan-time"
-              className="input"
+              
               inputMode="numeric"
               placeholder="45:00"
               value={
                 mode === 'time' ? timeText : Number.isFinite(finish) ? formatDuration(finish) : ''
               }
               readOnly={mode === 'pace'}
-              onChange={(event) => setTimeText(event.target.value)}
-            />
-          </div>
+              onChange={(event) => setTimeText(event.target.value)}/>
+          </Field>
         </Grid2>
 
         <StatRow>
@@ -203,7 +201,7 @@ function RaceEquivalents({
   const labels = unitLabels(units)
 
   return (
-    <table className="table">
+    <Table>
       <thead>
         <tr>
           <th>Race</th>
@@ -223,7 +221,7 @@ function RaceEquivalents({
                   · {formatDistance(race.meters, units, 1)} {labels.distance}
                 </Muted>
               </td>
-              <td className="num">{formatDuration(predicted)}</td>
+              <Num>{formatDuration(predicted)}</Num>
               <Muted as="td">
                 {formatPace(predicted / toDistance(race.meters, units))}
                 {labels.pace}
@@ -232,6 +230,6 @@ function RaceEquivalents({
           )
         })}
       </tbody>
-    </table>
+    </Table>
   )
 }

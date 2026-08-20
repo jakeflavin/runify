@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { Button, Muted, Panel } from '../ui.styled'
+import { Button, Floating, Grow, Input, ItemMeta, ItemName, List, ListItem, Muted, Panel, Spinner } from '../ui.styled'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2, MapPin, Search, X } from 'lucide-react'
 import { searchPlaces, type Place } from '@/api/nominatim'
@@ -46,10 +46,10 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
 
   return (
     <div ref={box} style={{ position: 'relative', flex: 1, minWidth: 180, maxWidth: 320 }}>
-      <div className="floating" style={{ borderRadius: 8, padding: '0 8px' }}>
+      <Floating  style={{ borderRadius: 8, padding: '0 8px' }}>
         <Muted as={Search} size={15} aria-hidden="true" />
-        <input
-          className="input"
+        <Input
+          
           style={{ border: 'none', background: 'transparent', height: 36 }}
           placeholder="Search for a place"
           value={text}
@@ -65,10 +65,9 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
               onPick(results[0])
               setOpen(false)
             }
-          }}
-        />
+          }}/>
         {isFetching ? (
-          <Muted as={Loader2} size={14} className="spin" aria-hidden="true" />
+          <Muted as={Spinner} forwardedAs={Loader2} size={14} aria-hidden="true" />
         ) : text ? (
           <Button $ghost $small $icon
             type="button"
@@ -81,7 +80,7 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
             <X size={14} />
           </Button>
         ) : null}
-      </div>
+      </Floating>
 
       {open && results.length > 0 && (
         <Panel
@@ -93,28 +92,27 @@ export function PlaceSearch({ onPick }: { onPick: (place: Place) => void }) {
             right: 0,
             boxShadow: 'var(--shadow-float)',
           }}>
-          <div className="list" style={{ padding: '4px 12px' }}>
+          <List  style={{ padding: '4px 12px' }}>
             {results.map((place) => (
-              <button
+              <ListItem
                 key={place.id}
                 type="button"
-                className="list-item"
+                
                 onClick={() => {
                   onPick(place)
                   setOpen(false)
                   setText(place.name)
-                }}
-              >
+                }}>
                 <Muted as={MapPin} size={14} aria-hidden="true" />
-                <span className="grow">
-                  <span className="name">{place.name}</span>
-                  <span className="meta" style={{ display: 'block' }}>
+                <Grow as="span">
+                  <ItemName as="span">{place.name}</ItemName>
+                  <ItemMeta as="span"  style={{ display: 'block' }}>
                     {place.detail}
-                  </span>
-                </span>
-              </button>
+                  </ItemMeta>
+                </Grow>
+              </ListItem>
             ))}
-          </div>
+          </List>
         </Panel>
       )}
     </div>

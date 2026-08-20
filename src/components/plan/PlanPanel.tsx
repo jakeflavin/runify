@@ -3,7 +3,7 @@
  */
 
 import { Suspense, lazy, useState } from 'react'
-import { Button, Chip, Empty, Row, StatRow } from '../ui.styled'
+import { Button, Chip, Empty, Input, Row, Spinner, StatRow } from '../ui.styled'
 import {
   Bike,
   Download,
@@ -88,7 +88,7 @@ export function PlanPanel({
           </Switch>
           {route.routing && (
             <Chip>
-              <Loader2 size={11} className="spin" aria-hidden="true" /> Routing
+              <Spinner as={Loader2} size={11} aria-hidden="true" /> Routing
             </Chip>
           )}
           {!route.routing && route.waypoints.length > 1 && snap && !route.fullySnapped && (
@@ -184,8 +184,8 @@ export function PlanPanel({
       {!empty && (
         <Section title="Keep it">
           <Row>
-            <input
-              className="input"
+            <Input
+              
               style={{ flex: 1, minWidth: 140 }}
               placeholder="Name this route"
               value={name}
@@ -196,8 +196,7 @@ export function PlanPanel({
                   onSave(name)
                   setName('')
                 }
-              }}
-            />
+              }}/>
             <Button $primary
               type="button"
               
